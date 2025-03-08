@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "IMWinUi (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "IMWinUi (Unpackaged)": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}

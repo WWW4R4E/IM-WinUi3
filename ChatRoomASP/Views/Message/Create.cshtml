@@ -1,0 +1,77 @@
+@model ChatRoomASP.Models.IMMessage
+
+@{
+    ViewData["Title"] = "创建新消息";
+    var sqlStatement = ViewData["sqlStatement"] as string;
+}
+
+<h1>创建新消息</h1>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Type" class="control-label">消息类型</label>
+        <input asp-for="Type" class="form-control" />
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="SenderName" class="control-label">发送者名称</label>
+        <input asp-for="SenderName" class="form-control" />
+        <span asp-validation-for="SenderName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ReceiverName" class="control-label">接收者名称</label>
+        <input asp-for="ReceiverName" class="form-control" />
+        <span asp-validation-for="ReceiverName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Content" class="control-label">消息内容</label>
+        <textarea asp-for="Content" class="form-control"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="SentAt" class="control-label">发送时间</label>
+        <input asp-for="SentAt" class="form-control" />
+        <span asp-validation-for="SentAt" class="text-danger"></span>
+    </div>
+    <div class="form-group form-check">
+        <label class="form-check-label">
+            <input class="form-check-input" asp-for="IsRead" /> @Html.DisplayNameFor(model => model.IsRead)
+        </label>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="创建" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">返回列表</a>
+</div>
+
+<!-- 新增 SQL 语句输入面板 -->
+<h2>执行 SQL 语句</h2>
+<form asp-action="ExecuteSql" method="post">
+    <div class="form-group">
+        <label for="sqlStatement" class="control-label">SQL 语句</label>
+        <textarea id="sqlStatement" name="sqlStatement" class="form-control" rows="5"></textarea>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="执行" class="btn btn-secondary" />
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            var sqlMessage = '@ViewBag.SqlMessage';
+            var sqlSuccess = @Html.Raw(Json.Serialize(ViewBag.SqlSuccess));
+
+            if (sqlMessage) {
+                alert(sqlMessage);
+                if (sqlSuccess) {
+                    $('#sqlStatement').val(''); // 清空 SQL 语句输入框
+                }
+            }
+        });
+    </script>
+}
