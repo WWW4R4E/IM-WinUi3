@@ -1,0 +1,63 @@
+# ASP.NET Core
+bin/
+obj/
+**/*.user
+**/*.userosscache
+**/*.suo
+**/*.userprefs
+**/*.sln.docstates
+
+# NuGet Packages
+packages/
+*.nupkg
+
+# Build Results
+*.dll
+*.pdb
+*.exe
+*.dll.config
+*.cache
+*.ilk
+*.log
+*.vspscc
+*.vssscc
+*.scc
+
+# OS and Editor metadata
+.vs/
+*.DS_Store
+*.vscode/
+*.idea/
+
+# Temporary Files
+*.tmp
+*.swp
+*.bak
+
+# Publish
+publish/
+
+# Logs
+*.log
+*.nlog
+
+# Other
+*.lock.json
+*.pidb
+*.userprefs
+*.sln.docstates
+*.ncrunch*
+*.nunit*
+*.resharper*
+_ReSharper*/
+*.DotSettings.user
+*.ReSharper
+*.ReSharper.user
+*.sln.docstates
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.vspscc
+*.vssscc
+*.scc

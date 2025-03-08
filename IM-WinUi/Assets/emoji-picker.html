@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+
+        @import url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.css');
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            /* 修改背景颜色为黑灰色 */
+        }
+
+        .emoji-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .emoji {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 2px;
+            font-family: 'FluentEmoji', sans-serif; 
+        }
+
+        .emoji:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="emoji-container" id="emojiContainer">
+        <!-- Emoji will be dynamically loaded here -->
+    </div>
+
+    <script>
+        // Emoji list
+        const emojis = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"];
+
+        // Load emojis into the container
+        const emojiContainer = document.getElementById("emojiContainer");
+        emojis.forEach(emoji => {
+            const emojiElement = document.createElement("div");
+            emojiElement.className = "emoji";
+            emojiElement.textContent = emoji;
+            emojiElement.addEventListener("click", () => {
+                // Send the selected emoji to the host application
+                window.chrome.webview.postMessage(emoji);
+            });
+            emojiContainer.appendChild(emojiElement);
+        });
+    </script>
+</body>
+
+</html>
