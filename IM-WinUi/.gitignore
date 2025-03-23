@@ -1,0 +1,91 @@
+# .gitignore for WinUI projects
+
+# Build directories
+bin/
+obj/
+.vs/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output
+*.dll
+*.pdb
+*.exe
+*.dll.config
+*.exe.config
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Visual Studio temporary files
+*.vspscc
+*.vssscc
+*.vspscc
+*.vssscc
+*.userosscache
+*.sln.docstates
+
+# ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# TeamCity
+_TeamCity*
+
+# Rider
+.idea/
+*.DotSettings.user
+
+# Windows Store Apps
+AppPackages/
+BundleArtifacts/
+PublishProfiles/
+
+# Other
+*.log
+*.vsix
+*.vsixmanifest
+*.vsixexpansion
+*.vsixlangpack
+*.vsixlangpack.xml
+*.vsixlangpack.resx
+*.vsixlangpack.resw
+*.vsixlangpack.resjson
+*.vsixlangpack.resx.json
+*.vsixlangpack.resw.json
+*.vsixlangpack.resjson.json
+*.vsixlangpack.resx.resw
+*.vsixlangpack.resx.resw.json
+*.vsixlangpack.resx.resjson.json
+*.vsixlangpack.resx.resw.resjson.json
+*.vsixlangpack.resx.resw.resjson.resx
+*.vsixlangpack.resx.resw.resjson.resx.json
+*.vsixlangpack.resx.resw.resjson.resx.resw
+*.vsixlangpack.resx.resw.resjson.resx.resw.json
+*.vsixlangpack.resx.resw.resjson.resx.resw.resjson
+*.vsixlangpack.resx.resw.resjson.resx.resw.resjson.json
+*.vsixlangpack.resx.resw.resjson.resx.resw.resjson.resx
+*.vsixlangpack.resx.resw.resjson.resx.resw.resjson.resx.json
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# JetBrains Rider
+*.DotSettings.user
+*.idea/

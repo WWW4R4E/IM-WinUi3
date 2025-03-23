@@ -3,7 +3,10 @@ using IMWinUi.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+<<<<<<< HEAD
 using Microsoft.UI.Xaml.Navigation;
+=======
+>>>>>>> db88e8f2b8d474da2d8111d86e9b7ab0b4c9099c
 using Microsoft.UI.Xaml.Shapes;
 using Microsoft.Web.WebView2.Core;
 using System;
@@ -14,9 +17,9 @@ using System.Linq;
 using Windows.Storage.Pickers;
 
 namespace IMWinUi.Views
-{
     public sealed partial class CommentPage : Page
     {
+<<<<<<< HEAD
         private ChatClientViewModel chatClient = new ChatClientViewModel();
         internal CommentPageViewModel CommentPageViewModel = new CommentPageViewModel();
 
@@ -38,9 +41,9 @@ namespace IMWinUi.Views
                 {
                     CommentPageViewModel.Users.Add(user);
                 }
-                CommentPageViewModel.SelectUser = CommentPageViewModel.Users.FirstOrDefault(x => x == user);
-            }
         }
+
+>>>>>>> db88e8f2b8d474da2d8111d86e9b7ab0b4c9099c
         private async void InitializeWebView()
         {
             await emojiWebView.EnsureCoreWebView2Async();
@@ -74,6 +77,9 @@ namespace IMWinUi.Views
                 Debug.WriteLine($"发送消息失败: {ex.Message}");
             }
         }
+
+
+        // 刷新当前用户的聊天记录
         private void ChatClient_MessageSent(object sender, MessageSentEventArgs e)
         {
             if (e.Success)

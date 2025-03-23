@@ -53,7 +53,7 @@
                     </NavigationViewItem.InfoBadge>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
-            <Frame x:Name="contentFrame" Background="Transparent" x:FieldModifier="public" />
+            <Frame x:Name="contentFrame" Background="Transparent"/>
         </NavigationView>
     </Grid>
 </Window>
