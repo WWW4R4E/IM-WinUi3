@@ -1,4 +1,4 @@
-﻿using IMWinUi.Models;
+using IMWinUi.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,39 +10,36 @@ using System.Threading.Tasks;
 namespace IMWinUi.ViewModels
 {
     internal class CommentPageViewModel : INotifyPropertyChanged
-    {
+    {        
+        public event PropertyChangedEventHandler PropertyChanged;
         private ObservableCollection<IMMessage> _messages;
-        private List<IMUser> _users;
-        private string _selectUser;
+        private ObservableCollection<IMUser> _users;
+        private IMUser _selectUser;
         private string _chatInput;
+
+        public ObservableCollection<IMUser> Users
+        {
+            get => _users;
+            set
+            {
+                if (_users != value)
+                {
+                    _users = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public ObservableCollection<IMMessage> Messages
         {
             get => _messages;
             set
             {
-                _messages = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public List<IMUser> Users
-        {
-            get => _users;
-            set
-            {
-                _users = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string SelectUser
-        {
-            get => _selectUser;
-            set
-            {
-                _selectUser = value;
-                OnPropertyChanged();
+                if (_messages != value)
+                {
+                    _messages = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -51,17 +48,18 @@ namespace IMWinUi.ViewModels
             get => _chatInput;
             set
             {
-                _chatInput = value;
-                OnPropertyChanged();
+                if (_chatInput != value)
+                {
+                    _chatInput = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
-        public ChatClientViewModel ChatClient { get; }
-
+        
         public CommentPageViewModel()
         {
-            ChatClient = new ChatClientViewModel();
-            Users = new List<IMUser>
+            Users = new ObservableCollection<IMUser>
             {
                 new IMUser(1, "张三"),
                 new IMUser(2, "王五")
@@ -69,36 +67,18 @@ namespace IMWinUi.ViewModels
             Messages = new ObservableCollection<IMMessage>();
         }
 
-        public async Task SendMessageAsync()
+        public IMUser SelectUser
         {
-            var iMMessage = new IMMessage(MessageType.Text, Properties.Settings.Default.LastUserName, SelectUser, ChatInput);
-            try
+            get => _selectUser;
+            set
             {
-                Debug.WriteLine("正在尝试发送消息");
-                await ChatClient.SendMessageAsync(iMMessage);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"发送消息失败: {ex.Message}");
-            }
-        }
-
-        public void RefreshChatMessages(string user)
-        {
-            Messages.Clear();
-
-            var db = new LocalDbcontext();
-            var newMessages = db.GetIMMessages(Properties.Settings.Default.LastUserName, user);
-            if (newMessages != null)
-            {
-                foreach (var message in newMessages)
+                if (_selectUser != value)
                 {
-                    Messages.Add(message);
+                    _selectUser = value;
+                    OnPropertyChanged();
                 }
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

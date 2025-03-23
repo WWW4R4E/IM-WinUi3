@@ -8,7 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:IMWinUi.Models"
     xmlns:viewmodels="using:IMWinUi.ViewModels"
-    mc:Ignorable="d">
+    mc:Ignorable="d" 
+    NavigationCacheMode="Enabled">
 
     <Page.Resources>
         <!-- 定义 DataTemplate -->
@@ -88,6 +89,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid>
@@ -102,8 +104,10 @@
             <Grid Grid.Row="1"
                   x:Name="ContactGrid">
                 <ListView
+                    x:Name="UserListView"
                     ItemsSource="{x:Bind ContactsCVS.View, Mode=OneWay}"
-                    ItemTemplate="{StaticResource ContactListViewTemplate}">
+                    ItemTemplate="{StaticResource ContactListViewTemplate}"
+                    SelectionChanged="ListView_SelectionChanged">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsStackPanel AreStickyGroupHeadersEnabled="False"/>
@@ -134,8 +138,9 @@
                 </ListBox>
             </Grid>
         </Grid>
-        <Grid Background="#1E1E1E"
-                Grid.Column="1">
+        <Border Width="1" Background="{ThemeResource SystemChromeAltMediumHighColor}" Grid.Column="1"/>
+        <Grid x:Name="UserInfromation"
+                Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -154,12 +159,9 @@
                 </Ellipse>
                 <StackPanel VerticalAlignment="Stretch"
                         Margin="20,8">
-                    <TextBlock Text="春日野穹"
+                    <TextBlock Text="{x:Bind ContactPageViewModel.User.Username, Mode=TwoWay}"
                             Foreground="White"
                             FontSize="16"/>
-                    <TextBlock Text="创建人 缘之空"
-                            Foreground="Gray"
-                            FontSize="12"/>
                 </StackPanel>
             </StackPanel>
 

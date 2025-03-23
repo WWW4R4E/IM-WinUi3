@@ -19,7 +19,7 @@ public sealed partial class MainWindow : Window
         SetTitleBar(AppTitleBar);
         NavigationService = new NavigationService();
         NavigationService.RegisterFrameAndNavigationView(contentFrame, IMNV);
-        NavigationService.NavigateTo("CommentPage");
+        NavigationService.NavigateTo("CommentPage",null);
     }
     
 
@@ -31,7 +31,7 @@ public sealed partial class MainWindow : Window
             var pageTag = selectedItem.Tag as string;
             if (!string.IsNullOrEmpty(pageTag))
             {
-                NavigationService.NavigateTo(pageTag);
+                NavigationService.NavigateTo(pageTag,null);
             }
         }
     }

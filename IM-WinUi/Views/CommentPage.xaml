@@ -5,8 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:IMWinUi.Models" 
-    xmlns:local="using:IMWinUi.Views"
-    mc:Ignorable="d">
+    xmlns:local="using:IMWinUi.Views"       
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled">
     <Page.Resources>
         <!-- 定义四种 DataTemplate -->
         <!-- 自己发送的文本消息 -->
@@ -57,11 +58,16 @@
                                            OtherImageTemplate="{StaticResource OtherImageMessageTemplate}" />
     </Page.Resources>
 
-    <Grid ColumnDefinitions="180,*">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
         <!-- 左侧联系人栏 -->
-        <Grid Grid.Column="0" Background="Transparent">
-            <ListBox x:Name="userListBox" ItemsSource="{x:Bind Users, Mode=OneWay}" SelectedItem="{Binding SelectUser}" SelectionChanged="ListBox_SelectChanged">
+        <Grid Grid.Column="0">
+            <ListBox Background="Transparent" x:Name="userListBox" ItemsSource="{x:Bind CommentPageViewModel.Users, Mode=TwoWay}" SelectedItem="{x:Bind CommentPageViewModel.SelectUser, Mode=TwoWay}" SelectionChanged="ListBox_SelectChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Username}"/>
@@ -69,12 +75,17 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
+        <Border Width="1" Background="{ThemeResource SystemChromeAltMediumHighColor}" Grid.Column="1"/>
 
         <!-- 右侧聊天记录 -->
-        <Grid Grid.Column="1" x:Name="MicaGrid" Margin="10" RowDefinitions="*,Auto">
+        <Grid Grid.Column="2" x:Name="MicaGrid" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <ListView x:Name="ChatListView"
                   ItemTemplateSelector="{StaticResource ChatMessageTemplateSelector}"
-                  ItemsSource="{x:Bind Messages, Mode=OneWay}"
+                  ItemsSource="{x:Bind  CommentPageViewModel.Messages, Mode=OneWay}"
                       SelectionMode="None">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate >
@@ -84,8 +95,15 @@
                 </ListView.ItemsPanel>
             </ListView>
 
-            <Grid Grid.Row="1" Padding="0,0,0,0" ColumnDefinitions="*,Auto,Auto,Auto">
-                <TextBox x:Name="chatInput" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" FontSize="21" Margin="0,0,10,0"/>
+            <Grid Grid.Row="1" Padding="0,0,0,0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="chatInput" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" FontSize="21" Margin="0,0,10,0" Text="{x:Bind CommentPageViewModel.ChatInput, Mode=TwoWay}"/>
                 <Button x:Name="sendTextButton" Grid.Column="1" Content="📩" Click="sendTextButton_Click" CornerRadius="5" FontSize="21" Margin="0,0,10,0"/>
                 <Button x:Name="sendEmojiButton" Grid.Column="2" Content="😄" CornerRadius="5" FontSize="21" Margin="0,0,10,0">
                     <Button.Flyout>

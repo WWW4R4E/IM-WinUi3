@@ -3,6 +3,7 @@ using IMWinUi.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using Microsoft.Web.WebView2.Core;
 using System;
@@ -16,27 +17,30 @@ namespace IMWinUi.Views
 {
     public sealed partial class CommentPage : Page
     {
-        private ObservableCollection<IMMessage> Messages;
-        private List<IMUser> Users;
-        private string selectUser;
         private ChatClientViewModel chatClient = new ChatClientViewModel();
+        internal CommentPageViewModel CommentPageViewModel = new CommentPageViewModel();
 
         public CommentPage()
         {
-            Users = new List<IMUser>
-            {
-                new IMUser(1, "张三"),
-                new IMUser(2, "王五")
-            };
-
             this.InitializeComponent();
             InitializeWebView();
-            Messages = new ObservableCollection<IMMessage>(); // 初始化Messages集合
-            chatClient.MessageSent += ChatClient_MessageSent; // 订阅发送成功事件
-
-
+            chatClient.MessageSent += ChatClient_MessageSent;
         }
 
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            var data = e.Parameter;
+            if (data != null && data is IMUser user)
+            {
+                if (!CommentPageViewModel.Users.Any(x => x == user))
+                {
+                    CommentPageViewModel.Users.Add(user);
+                }
+                CommentPageViewModel.SelectUser = CommentPageViewModel.Users.FirstOrDefault(x => x == user);
+            }
+        }
         private async void InitializeWebView()
         {
             await emojiWebView.EnsureCoreWebView2Async();
@@ -53,13 +57,13 @@ namespace IMWinUi.Views
 
         private async void sendTextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(selectUser))
+            if (string.IsNullOrEmpty(CommentPageViewModel.SelectUser.Username))
             {
                 Debug.WriteLine("请选择一个用户发送消息。");
                 return;
             }
 
-            var iMMessage = new IMMessage(MessageType.Text, Properties.Settings.Default.LastUserName, selectUser, chatInput.Text);
+            var iMMessage = new IMMessage(MessageType.Text, Properties.Settings.Default.LastUserName, CommentPageViewModel.SelectUser.Username, chatInput.Text);
             try
             {
                 Debug.WriteLine("正在尝试发送消息");
@@ -76,10 +80,10 @@ namespace IMWinUi.Views
             {
                 DispatcherQueue.TryEnqueue(() =>
                 {
-                    RefreshChatMessages(selectUser);
+                    RefreshChatMessages(CommentPageViewModel.SelectUser.Username);
                     chatInput.Text = string.Empty;
                 });
-                
+
             }
         }
 
@@ -113,26 +117,27 @@ namespace IMWinUi.Views
             if (userListBox.SelectedItem == null) return;
 
             var newUser = ((IMUser)userListBox.SelectedItem).Username;
-            if (selectUser != newUser)
+            if (CommentPageViewModel.SelectUser.Username != newUser)
             {
-                selectUser = newUser;
-                RefreshChatMessages(selectUser);
+                CommentPageViewModel.SelectUser.Username = newUser;
+                RefreshChatMessages(CommentPageViewModel.SelectUser.Username);
             }
         }
 
         private void RefreshChatMessages(string user)
         {
-            if (Messages != null)
+            if (CommentPageViewModel.Messages != null)
             {
-                Messages.Clear();
+                CommentPageViewModel.Messages.Clear();
             }
 
             var db = new LocalDbcontext();
             var newMessages = db.GetIMMessages(Properties.Settings.Default.LastUserName, user);
-            if (newMessages != null){
+            if (newMessages != null)
+            {
                 foreach (var message in newMessages)
                 {
-                    Messages.Add(message);
+                    CommentPageViewModel.Messages.Add(message);
                 }
             }
         }

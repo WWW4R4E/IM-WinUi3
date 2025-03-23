@@ -13,7 +13,11 @@
     <Window.SystemBackdrop>
         <MicaBackdrop/>
     </Window.SystemBackdrop>
-    <Grid RowDefinitions="32,*">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid x:Name="AppTitleBar">
             <Image Source="/Assets/LockScreenLogo.png"
                    HorizontalAlignment="Left" 
@@ -25,8 +29,13 @@
                        VerticalAlignment="Center"
                        Margin="28,0,0,0"/>
         </Grid>
-        <NavigationView x:Name="IMNV" Grid.Row="1" SelectionChanged="IMNV_SelectionChanged" IsBackButtonVisible="Collapsed" PaneDisplayMode="LeftCompact" IsPaneToggleButtonVisible="False"
-                        x:FieldModifier="public">
+        <NavigationView x:Name="IMNV" Grid.Row="1" 
+                        SelectionChanged="IMNV_SelectionChanged" 
+                        IsBackButtonVisible="Collapsed" 
+                        PaneDisplayMode="LeftCompact" 
+                        IsPaneToggleButtonVisible="False"
+                        CacheMode="BitmapCache"
+                        >
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Comment" Content="Menu Item1" Tag="CommentPage">
                     <NavigationViewItem.InfoBadge>

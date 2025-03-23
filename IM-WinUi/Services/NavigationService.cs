@@ -18,39 +18,21 @@ namespace IMWinUi.Services
         }
 
         // 导航到指定页面
-        public void NavigateTo(string pageTag)
+        public void NavigateTo(string pageTag, object data)
         {
             if (_contentFrame == null || _navigationView == null)
             {
                 Debug.WriteLine("Frame 或 NavigationView 未注册");
                 return;
             }
-
-            // 找到对应的 NavigationViewItem
             var selectedItem = _navigationView.MenuItems
                 .OfType<NavigationViewItem>()
                 .FirstOrDefault(item => item.Tag?.ToString() == pageTag);
+            _navigationView.SelectedItem = selectedItem;
 
-            if (selectedItem != null)
-            {
-                // 设置 NavigationView 的选中项
-                _navigationView.SelectedItem = selectedItem;
-
-                // 导航到对应页面
-                Type pageType = Type.GetType($"IMWinUi.Views.{pageTag}");
-                if (pageType != null)
-                {
-                    _contentFrame.Navigate(pageType, null);
-                }
-                else
-                {
-                    Debug.WriteLine($"未找到对应页面: {pageTag}");
-                }
-            }
-            else
-            {
-                Debug.WriteLine($"未找到对应 NavigationViewItem: {pageTag}");
-            }
+            // 导航到对应页面
+            Type pageType = Type.GetType($"IMWinUi.Views.{pageTag}");
+            _contentFrame.Navigate(pageType, data);
         }
     }
 }

@@ -10,6 +10,39 @@
     mc:Ignorable="d">
 
     <Grid>
+        <ListView ItemsSource="{x:Bind Items}" SelectionMode="None">
+                <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:FavoriteItem">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="240"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Image Source="/Assets/logo.jpg" Width="200" Height="200" Margin="5" HorizontalAlignment="Center"/>
+                        </Grid>
+                        <StackPanel Grid.Column="1">
+                            <!-- 文本内容 -->
+                            <TextBlock Text="{x:Bind Text}" FontSize="16" Margin="0,10,0,10" />
 
+                            <!-- 图片网格 -->
+                            <GridView ItemsSource="{x:Bind ImageUrls}"
+                          MaxWidth="300" HorizontalAlignment="Left">
+                                <GridView.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Image Source="{x:Bind}" Width="100" Height="100" Margin="5" />
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+                                <GridView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3" />
+                                    </ItemsPanelTemplate>
+                                </GridView.ItemsPanel>
+                            </GridView>
+                        </StackPanel>
+                    </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
     </Grid>
 </Page>
