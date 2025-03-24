@@ -22,13 +22,13 @@
                     Margin="10"/>
 
         <!-- 选项卡 -->
-        <NavigationView x:Name="nvSample" PaneDisplayMode="Top"
+        <NavigationView x:Name="NvSample" PaneDisplayMode="Top"
     SelectionFollowsFocus="Enabled" IsBackButtonVisible="Collapsed" IsSettingsVisible="False">
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Play" Content="用户" x:Name="SamplePage1Item" />
                 <NavigationViewItem Icon="Save" Content="群聊" x:Name="SamplePage2Item" />
             </NavigationView.MenuItems>
-            <Frame x:Name="contentFrame"/>
+            <Frame x:Name="ContentFrame"/>
         </NavigationView>
     </StackPanel>
 </Window>

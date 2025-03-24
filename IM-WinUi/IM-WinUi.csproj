@@ -15,7 +15,10 @@
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     </PropertyGroup>
     <ItemGroup>
+      <None Remove="Controls\SettingExpander.xaml" />
+      <None Remove="Controls\SettingToggleSwitch.xaml" />
       <None Remove="Views\SearchWindow.xaml" />
+      <None Remove="Views\SettingPage.xaml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -80,10 +83,19 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
+        <Page Update="Controls\SettingExpander.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Controls\SettingToggleSwitch.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
         <None Update="Properties\Settings.settings">
             <Generator>SettingsSingleFileGenerator</Generator>
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
         </None>
+        <Page Update="Views\SettingPage.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
         <Page Update="Views\SearchWindow.xaml">
           <Generator>MSBuild:Compile</Generator>
         </Page>

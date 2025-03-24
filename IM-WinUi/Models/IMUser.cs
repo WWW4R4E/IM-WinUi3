@@ -11,8 +11,9 @@ namespace IMWinUi.Models
             this.Username = userName;
         }
 
-        public IMUser()
-        { }
+        private IMUser()
+        {
+        }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

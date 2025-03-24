@@ -19,7 +19,7 @@ namespace IMWinUi.ViewModels
             _ = InitializeAsync();
         }
 
-        public async Task InitializeAsync()
+        private async Task InitializeAsync()
         {
             Debug.WriteLine("开始初始化 HubConnection...");
 
@@ -41,14 +41,9 @@ namespace IMWinUi.ViewModels
                 await _hubConnection.StartAsync();
 
                 // 检查连接状态以确认是否成功连接
-                if (_hubConnection.State == HubConnectionState.Connected)
-                {
-                    Debug.WriteLine("HubConnection 已成功启动。");
-                }
-                else
-                {
-                    Debug.WriteLine($"HubConnection 启动失败，当前状态: {_hubConnection.State}");
-                }
+                Debug.WriteLine(_hubConnection.State == HubConnectionState.Connected
+                    ? "HubConnection 已成功启动。"
+                    : $"HubConnection 启动失败，当前状态: {_hubConnection.State}");
             }
             catch (Exception ex)
             {
@@ -70,32 +65,40 @@ namespace IMWinUi.ViewModels
         }
 
 
-        private void ReceiveMessage(string messageJson)
+    private void ReceiveMessage(string messageJson)
+    {
+        try
         {
-            try
-            {
-                var message = JsonSerializer.Deserialize<IMMessage>(messageJson);
+            var message = JsonSerializer.Deserialize<IMMessage>(messageJson);
 
-                using (LocalDbcontext chatingContext = new LocalDbcontext())
-                {
-                    chatingContext.CreateMessage(message);
-                    Debug.WriteLine("消息已保存到数据库。");
-                    OnMessageSent(new MessageSentEventArgs { Success = true});
-                }
-            }
-            catch (Exception ex)
+            if (message == null)
             {
-                Debug.WriteLine($"处理消息失败: {ex.Message}");
+                Debug.WriteLine("反序列化后的消息为 null。");
+                throw new ArgumentNullException(nameof(message), "反序列化后的消息为 null。");
+            }
+
+            using (LocalDbcontext chatingContext = new LocalDbcontext())
+            {
+                chatingContext.CreateMessage(message);
+                Debug.WriteLine("消息已保存到数据库。");
+                OnMessageSent(new MessageSentEventArgs { Success = true });
             }
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"处理消息失败: {ex.Message}");
+        }
+    }
+
         protected virtual void OnMessageSent(MessageSentEventArgs e)
         {
-            MessageSent?.Invoke(this, e);
+            MessageSent(this, e);
         }
 
-        public async Task SendMessageFailed()
+        private Task SendMessageFailed()
         {
             Debug.WriteLine("发送失败了");
+            return Task.CompletedTask;
         }
         public async Task<bool> SendMessageAsync(IMMessage message)
         {
@@ -120,6 +123,6 @@ namespace IMWinUi.ViewModels
     // 定义事件参数类
     public class MessageSentEventArgs : EventArgs
     {
-        public bool Success { get; set; }
+        public bool Success { get; init; }
     }
 }
