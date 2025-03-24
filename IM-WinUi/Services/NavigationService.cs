@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace IMWinUi.Services
@@ -11,28 +10,27 @@ namespace IMWinUi.Services
         private NavigationView _navigationView;
 
         // 注册 Frame 和 NavigationView
-        public void RegisterFrameAndNavigationView(Frame contentFrame, NavigationView navigationView)
+        public NavigationService(Frame contentFrame, NavigationView navigationView)
         {
             _contentFrame = contentFrame;
             _navigationView = navigationView;
         }
-
         // 导航到指定页面
-        public void NavigateTo(string pageTag, object data)
+        public void NavigateTo(string pageTag, object? data)
         {
-            if (_contentFrame == null || _navigationView == null)
-            {
-                Debug.WriteLine("Frame 或 NavigationView 未注册");
-                return;
-            }
             var selectedItem = _navigationView.MenuItems
                 .OfType<NavigationViewItem>()
                 .FirstOrDefault(item => item.Tag?.ToString() == pageTag);
             _navigationView.SelectedItem = selectedItem;
 
             // 导航到对应页面
-            Type pageType = Type.GetType($"IMWinUi.Views.{pageTag}");
+            Type? pageType = Type.GetType($"IMWinUi.Views.{pageTag}");
+            if (pageType == null)
+            {
+                throw new InvalidOperationException($"无法找到页面类型: IMWinUi.Views.{pageTag}");
+            }
             _contentFrame.Navigate(pageType, data);
         }
+
     }
 }

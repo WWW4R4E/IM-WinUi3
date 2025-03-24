@@ -5,10 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:IMWinUi.Models" 
-    xmlns:local="using:IMWinUi.Views"       
-    mc:Ignorable="d"
-    NavigationCacheMode="Enabled">
+    xmlns:local="using:IMWinUi.Views" 
+    xmlns:converter="using:IMWinUi.Converter"
+    mc:Ignorable="d"    
+    >
     <Page.Resources>
+        <converter:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
         <!-- 定义四种 DataTemplate -->
         <!-- 自己发送的文本消息 -->
         <DataTemplate x:Key="MyTextMessageTemplate" x:DataType="model:IMMessage">
@@ -56,6 +58,41 @@
                                            MyImageTemplate="{StaticResource MyImageMessageTemplate}"
                                            OtherTextTemplate="{StaticResource OtherTextMessageTemplate}"
                                            OtherImageTemplate="{StaticResource OtherImageMessageTemplate}" />
+        <!--左侧列表样式-->
+        <DataTemplate x:Key="ContactListViewTemplate" x:DataType="model:CommentListItem">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Ellipse x:Name="Ellipse"
+                    Grid.RowSpan="2"
+                    Width ="32"
+                    Height="32"
+                    Margin="6"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="{x:Bind user.ProfilePicture, Converter={StaticResource ByteArrayToImageConverter}}"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <TextBlock Grid.Column="1"
+                    Text="{x:Bind user.Username}"
+                    x:Phase="1"
+                    Style="{ThemeResource BaseTextBlockStyle}"
+                    Margin="12,6,0,0"/>
+                <TextBlock  Grid.Column="1"
+                    Grid.Row="1"
+                    Text="{x:Bind Message.Content}"
+                    x:Phase="2"
+                    Style="{ThemeResource BodyTextBlockStyle}"
+                    Margin="12,0,0,6"/>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid>
@@ -67,24 +104,18 @@
 
         <!-- 左侧联系人栏 -->
         <Grid Grid.Column="0">
-            <ListBox Background="Transparent" x:Name="userListBox" ItemsSource="{x:Bind CommentPageViewModel.Users, Mode=TwoWay}" SelectedItem="{x:Bind CommentPageViewModel.SelectUser, Mode=TwoWay}" SelectionChanged="ListBox_SelectChanged">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Username}"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Grid>
-        <Border Width="1" Background="{ThemeResource SystemChromeAltMediumHighColor}" Grid.Column="1"/>
+            <ListView Background="Transparent" ItemTemplate="{StaticResource ContactListViewTemplate}" x:Name="UserListBox" ItemsSource="{x:Bind CommentPageViewModel.CommentLists, Mode=TwoWay}" SelectionChanged="ListView_SelectChanged"/>
+            </Grid>
+        <Border Width="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Grid.Column="1"/>
 
         <!-- 右侧聊天记录 -->
-        <Grid Grid.Column="2" x:Name="MicaGrid" Margin="5">
+        <Grid Grid.Column="2" Margin="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <ListView x:Name="ChatListView"
-                  ItemTemplateSelector="{StaticResource ChatMessageTemplateSelector}"
+            <ListView
+                ItemTemplateSelector="{StaticResource ChatMessageTemplateSelector}"
                   ItemsSource="{x:Bind  CommentPageViewModel.Messages, Mode=OneWay}"
                       SelectionMode="None">
                 <ListView.ItemsPanel>
@@ -103,16 +134,16 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox x:Name="chatInput" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" FontSize="21" Margin="0,0,10,0" Text="{x:Bind CommentPageViewModel.ChatInput, Mode=TwoWay}"/>
-                <Button x:Name="sendTextButton" Grid.Column="1" Content="📩" Click="sendTextButton_Click" CornerRadius="5" FontSize="21" Margin="0,0,10,0"/>
-                <Button x:Name="sendEmojiButton" Grid.Column="2" Content="😄" CornerRadius="5" FontSize="21" Margin="0,0,10,0">
+                <TextBox x:Name="ChatInput" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" FontSize="21" Margin="0,0,10,0" Text="{x:Bind CommentPageViewModel.ChatInput, Mode=TwoWay}"/>
+                <Button Grid.Column="1" Content="📩" Click="sendTextButton_Click" CornerRadius="5" FontSize="21" Margin="0,0,10,0"/>
+                <Button Grid.Column="2" Content="😄" CornerRadius="5" FontSize="21" Margin="0,0,10,0">
                     <Button.Flyout>
                         <Flyout>
-                            <WebView2 x:Name="emojiWebView" Width="310" Height="300"/>
+                            <WebView2 x:Name="EmojiWebView" Width="310" Height="300"/>
                         </Flyout>
                     </Button.Flyout>
                 </Button>
-                <Button x:Name="sendImageButton" Grid.Column="3" Content="📂" Click="ImageButton_Click" CornerRadius="5" FontSize="21"/>
+                <Button Grid.Column="3" Content="📂" Click="ImageButton_Click" CornerRadius="5" FontSize="21"/>
             </Grid>
         </Grid>
     </Grid>

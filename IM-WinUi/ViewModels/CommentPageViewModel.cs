@@ -1,88 +1,77 @@
-using IMWinUi.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using IMWinUi.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IMWinUi.ViewModels
 {
-    internal class CommentPageViewModel : INotifyPropertyChanged
-    {        
-        public event PropertyChangedEventHandler PropertyChanged;
-        private ObservableCollection<IMMessage> _messages;
+    internal partial class CommentPageViewModel : ObservableObject
+    {
+        [ObservableProperty]
         private ObservableCollection<IMUser> _users;
-        private IMUser _selectUser;
+
+        [ObservableProperty]
+        private ObservableCollection<IMMessage> _messages;
+
+        [ObservableProperty]
         private string _chatInput;
 
-        public ObservableCollection<IMUser> Users
-        {
-            get => _users;
-            set
-            {
-                if (_users != value)
-                {
-                    _users = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        [ObservableProperty]
+        private IMUser _selectUser;
 
-        public ObservableCollection<IMMessage> Messages
-        {
-            get => _messages;
-            set
-            {
-                if (_messages != value)
-                {
-                    _messages = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        [ObservableProperty]
+        private ObservableCollection<CommentListItem> _commentLists = new();
 
-        public string ChatInput
-        {
-            get => _chatInput;
-            set
-            {
-                if (_chatInput != value)
-                {
-                    _chatInput = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        
         public CommentPageViewModel()
         {
-            Users = new ObservableCollection<IMUser>
-            {
-                new IMUser(1, "张三"),
-                new IMUser(2, "王五")
-            };
-            Messages = new ObservableCollection<IMMessage>();
+            var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
+            Users = content.GetHistoryImUsers();
+            InitializeCommentLists();
         }
 
-        public IMUser SelectUser
+        partial void OnUsersChanged(ObservableCollection<IMUser> value)
         {
-            get => _selectUser;
-            set
+            InitializeCommentLists();
+        }
+
+        partial void OnSelectUserChanged(IMUser value)
+        {
+            Debug.WriteLine($"切换了用户{value.Username}");
+        }
+
+
+        private void InitializeCommentLists()
+        {
+            CommentLists.Clear();
+
+            var loginUser = Properties.Settings.Default.LastUserName ?? string.Empty;
+            if (string.IsNullOrEmpty(loginUser))
             {
-                if (_selectUser != value)
+                Debug.Write("用户或用户名为空");
+                return;
+            }
+
+            var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
+            var Message = content.IMMessages;
+            foreach (var user in Users)
+            {
+                var latestMessage = Message
+                    .Where(m =>
+                        (m.SenderName == loginUser && m.ReceiverName == user.Username) ||
+                        (m.SenderName == user.Username && m.ReceiverName == loginUser)
+                    )
+                    .OrderByDescending(msg => msg.SentAt)
+                    .FirstOrDefault();
+
+                // 确保至少有一个消息存在才创建列表项
+                if (latestMessage != null)
                 {
-                    _selectUser = value;
-                    OnPropertyChanged();
+                    CommentLists.Add(new CommentListItem { user = user, Message = latestMessage });
                 }
             }
-        }
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

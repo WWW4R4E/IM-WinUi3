@@ -15,7 +15,10 @@
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     </PropertyGroup>
     <ItemGroup>
+      <None Remove="Controls\SettingExpander.xaml" />
+      <None Remove="Controls\SettingToggleSwitch.xaml" />
       <None Remove="Views\SearchWindow.xaml" />
+      <None Remove="Views\SettingPage.xaml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -41,11 +44,12 @@
         <ProjectCapability Include="Msix" />
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.2" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250208002-preview1" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250310001" />
         <PackageReference Include="RabbitMQ.Client" Version="7.1.1" />
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.2" />
     </ItemGroup>
@@ -80,10 +84,19 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
+        <Page Update="Controls\SettingExpander.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Controls\SettingToggleSwitch.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
         <None Update="Properties\Settings.settings">
             <Generator>SettingsSingleFileGenerator</Generator>
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
         </None>
+        <Page Update="Views\SettingPage.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
         <Page Update="Views\SearchWindow.xaml">
           <Generator>MSBuild:Compile</Generator>
         </Page>

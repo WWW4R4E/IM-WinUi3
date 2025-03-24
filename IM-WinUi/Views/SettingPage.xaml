@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+  x:Class="IMWinUi.Views.SettingPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:IMWinUi.Views"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:IMWinUi.Controls"
+    mc:Ignorable="d"
+  NavigationCacheMode="Enabled">
+    <Page.Resources>
+        <Style x:Key="SettingStackPanelStyle" TargetType="StackPanel">
+            <Setter Property="Spacing" Value="13" />
+            <Setter Property="Orientation" Value="Vertical" />
+        </Style>
+    </Page.Resources>
+
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0"
+                  HorizontalScrollMode="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="40">
+                <controls:SettingExpander SettingTitle="登录设置"
+                                 SettingDescription="与登录行为相关的设置"
+                                 SettingGlyph="&#xE77B;">
+                    <controls:SettingExpander.SettingContent>
+                        <StackPanel Style="{StaticResource SettingStackPanelStyle}">
+                            <controls:Panel>
+                                <RelativePanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Text="默认自动登录"
+                               Style="{ThemeResource BodyTextBlockStyle}"/>
+                                        <TextBlock Text="如果启用则不会出现登录窗口" 
+                                  FontSize="12"     Opacity="0.6"/>
+
+                                    </StackPanel>
+                                    <ComboBox
+                            RelativePanel.AlignRightWithPanel="True" SelectedIndex="1">
+                                        <x:String>Blue</x:String>
+                                        <x:String>Green</x:String>
+                                        <x:String>Red</x:String>
+                                        <x:String>Yellow</x:String>
+                                    </ComboBox>
+                                </RelativePanel>
+                            </controls:Panel>
+                        </StackPanel>
+                    </controls:SettingExpander.SettingContent>
+                </controls:SettingExpander>
+                <controls:SettingExpander SettingTitle="外观设置" SettingDescription="与外观相关的设置" SettingGlyph="&#xE790;">
+                    <controls:SettingExpander.SettingContent>
+                        <controls:Panel>
+                            <RelativePanel>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="默认自动登录"
+            Style="{ThemeResource BodyTextBlockStyle}"/>
+                                    <TextBlock Text="如果启用则不会出现登录窗口" 
+               FontSize="12" Opacity="0.6"/>
+
+                                </StackPanel>
+                                <controls:SettingToggleSwitch RelativePanel.AlignRightWithPanel="True" />
+                            </RelativePanel>
+
+                        </controls:Panel>
+                    </controls:SettingExpander.SettingContent>
+                </controls:SettingExpander>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

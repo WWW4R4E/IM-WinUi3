@@ -10,13 +10,13 @@ namespace IMWinUi.Views
         public DataTemplate MyImageTemplate { get; set; }
         public DataTemplate OtherTextTemplate { get; set; }
         public DataTemplate OtherImageTemplate { get; set; }
-        string MyName = Properties.Settings.Default.LastUserName;
+        private readonly string _myName = Properties.Settings.Default.LastUserName;
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
             if (item is IMMessage message)
             {
-                if (message.SenderName == MyName)
+                if (message.SenderName == _myName)
                 {
                     return message.Type == MessageType.Text ? MyTextTemplate : MyImageTemplate;
                 }

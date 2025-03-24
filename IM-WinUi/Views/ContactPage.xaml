@@ -1,208 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="IMWinUi.Views.ContactPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:IMWinUi.Views"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:IMWinUi.Models"
-    xmlns:viewmodels="using:IMWinUi.ViewModels"
-    mc:Ignorable="d" 
-    NavigationCacheMode="Enabled">
+  x:Class="IMWinUi.Views.ContactPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:IMWinUi.Views"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:models="using:IMWinUi.Models"
+  xmlns:viewmodels="using:IMWinUi.ViewModels"
+  xmlns:converter="using:IMWinUi.Converter"
+  mc:Ignorable="d"
+  NavigationCacheMode="Enabled">
 
-    <Page.Resources>
-        <!-- 定义 DataTemplate -->
-        <DataTemplate x:Key="ContactListViewTemplate"
-                      x:DataType="models:IMUser">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+  <Page.Resources>
+    <!-- 定义 Converter -->
+    <converter:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
+
+    <!-- 定义 DataTemplate -->
+    <DataTemplate x:Key="ContactListViewTemplate"
+                  x:DataType="models:IMUser">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
                 <Ellipse x:Name="Ellipse"
                          Grid.RowSpan="2"
                          Width="32"
                          Height="32"
                          Margin="6"
                          VerticalAlignment="Center"
-                         HorizontalAlignment="Center"
-                         Fill="{ThemeResource SystemControlBackgroundBaseMediumBrush}"/>
-                <TextBlock Grid.Column="1"
-                           Text="{x:Bind Username}"
-                           x:Phase="1"
-                           Style="{ThemeResource BaseTextBlockStyle}"
-                           Margin="12,6,0,0"/>
-                <TextBlock Grid.Column="1"
-                           Grid.Row="1"
-                           Text="{x:Bind UserId}"
-                           x:Phase="2"
-                           Style="{ThemeResource BodyTextBlockStyle}"
-                           Margin="12,0,0,6"/>
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="ContactTemplate">
-            <StackPanel Orientation="Horizontal"
-                        Margin="5">
-                <Image Width="40"
-                       Height="40"
-                       Source="ms-appx:///Assets/ContactPlaceholder.png"/>
-                <StackPanel Margin="10,0,0,0"
-                            VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Name}"
-                               FontWeight="SemiBold"
-                               FontSize="16"/>
-                    <TextBlock Text="{Binding Subtitle}"
-                               FontSize="12"
-                               Foreground="Gray"/>
-                </StackPanel>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="GroupTemplate">
-            <StackPanel Orientation="Horizontal"
-                        Margin="5">
-                <Image Width="40"
-                       Height="40"
-                       Source="ms-appx:///Assets/GroupPlaceholder.png"/>
-                <StackPanel Margin="10,0,0,0"
-                            VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Name}"
-                               FontWeight="SemiBold"
-                               FontSize="16"/>
-                    <TextBlock Text="{Binding Subtitle}"
-                               FontSize="12"
-                               Foreground="Gray"/>
-                </StackPanel>
-            </StackPanel>
-        </DataTemplate>
-        <CollectionViewSource x:Name="ContactsCVS"
-                IsSourceGrouped="True"/>
-    </Page.Resources>
-
-    
-    
-    
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="48"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <AutoSuggestBox Margin="8"
-                            PlaceholderText="搜索"
-                            GettingFocus="AutoSuggestBox_GettingFocus"
-                            LosingFocus="AutoSuggestBox_LosingFocus"/>
-            <Grid Grid.Row="1"
-                  x:Name="ContactGrid">
-                <ListView
-                    x:Name="UserListView"
-                    ItemsSource="{x:Bind ContactsCVS.View, Mode=OneWay}"
-                    ItemTemplate="{StaticResource ContactListViewTemplate}"
-                    SelectionChanged="ListView_SelectionChanged">
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsStackPanel AreStickyGroupHeadersEnabled="False"/>
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                    <ListView.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
-                                <DataTemplate x:DataType="models:GroupInfoList">
-                                    <Border AutomationProperties.AccessibilityView="Raw">
-                                        <TextBlock Text="{x:Bind Key}"
-                                                Style="{ThemeResource TitleTextBlockStyle}"
-                                                AutomationProperties.AccessibilityView="Raw"/>
-                                    </Border>
-                                </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
-                        </GroupStyle>
-                    </ListView.GroupStyle>
-                </ListView>
-            </Grid>
-            <Grid x:Name="NewContactGrid"
-                  Grid.Row="1"
-                  Background="Transparent"
-                  Visibility="Collapsed">
-                <ListBox SelectionChanged="ListBox_SelectionChanged" Background="Transparent">
-                    <x:String>用户</x:String>
-                    <x:String>群聊</x:String>
-                </ListBox>
-            </Grid>
-        </Grid>
-        <Border Width="1" Background="{ThemeResource SystemChromeAltMediumHighColor}" Grid.Column="1"/>
-        <Grid x:Name="UserInfromation"
-                Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <!-- 用户信息 -->
-            <StackPanel Grid.Row="0"
-                    Margin="20"
-                    Orientation="Horizontal">
-                <Ellipse Width="50"
-                        Height="50"
-                        Margin="0,0,0,10">
+                         HorizontalAlignment="Center">
                     <Ellipse.Fill>
-                        <ImageBrush ImageSource="/Assets/logo.jpg"/>
+                        <ImageBrush ImageSource="{x:Bind ProfilePicture, Converter={StaticResource ByteArrayToImageConverter}}"/>
                     </Ellipse.Fill>
                 </Ellipse>
-                <StackPanel VerticalAlignment="Stretch"
-                        Margin="20,8">
-                    <TextBlock Text="{x:Bind ContactPageViewModel.User.Username, Mode=TwoWay}"
-                            Foreground="White"
-                            FontSize="16"/>
-                </StackPanel>
-            </StackPanel>
+  
+        <TextBlock Grid.Column="1"
+                   Text="{x:Bind Username}"
+                   x:Phase="1"
+                   Style="{ThemeResource BaseTextBlockStyle}"
+                   Margin="12,6,0,0"/>
+        <TextBlock Grid.Column="1"
+                   Grid.Row="1"
+                   Text="{x:Bind UserId}"
+                   x:Phase="2"
+                   Style="{ThemeResource BodyTextBlockStyle}"
+                   Margin="12,0,0,6"/>
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="ContactTemplate">
+      <StackPanel Orientation="Horizontal"
+                  Margin="5">
+        <Image Width="40"
+               Height="40"
+               Source="ms-appx:///Assets/ContactPlaceholder.png"/>
+        <StackPanel Margin="10,0,0,0"
+                    VerticalAlignment="Center">
+          <TextBlock Text="{Binding Name}"
+                     FontWeight="SemiBold"
+                     FontSize="16"/>
+          <TextBlock Text="{Binding Subtitle}"
+                     FontSize="12"
+                     Foreground="Gray"/>
+        </StackPanel>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate x:Key="GroupTemplate">
+      <StackPanel Orientation="Horizontal"
+                  Margin="5">
+        <Image Width="40"
+               Height="40"
+               Source="ms-appx:///Assets/GroupPlaceholder.png"/>
+        <StackPanel Margin="10,0,0,0"
+                    VerticalAlignment="Center">
+          <TextBlock Text="{Binding Name}"
+                     FontWeight="SemiBold"
+                     FontSize="16"/>
+          <TextBlock Text="{Binding Subtitle}"
+                     FontSize="12"
+                     Foreground="Gray"/>
+        </StackPanel>
+      </StackPanel>
+    </DataTemplate>
+    <CollectionViewSource x:Name="ContactsCvs"
+                          IsSourceGrouped="True"/>
+  </Page.Resources>
 
-            <!-- 简介和举报 -->
-            <StackPanel x:Name="stake1"
-                    Grid.Row="1"
-                    Margin="20">
-                <Line Stroke="AliceBlue"
-                      X1="0"
-                        Loaded="LineElement_Loaded"
-                      StrokeThickness="2"/>
-                <TextBlock Text="简介"
-                        Foreground="White"
-                        FontSize="14"
-                        Margin="0,10,0,5"/>
-                <TextBlock Text="服务器繁忙，请稍后再试..."
-                        Foreground="White"
-                        FontSize="12"/>
-                <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Right"
-                        Margin="0,10,0,0">
-                    <Button Content="举报"
-                            Width="60"
-                            Background="Transparent"
-                            BorderBrush="Gray"
-                            Foreground="White"
-                            Margin="0,0,10,0"/>
-                    <Button Content="分享"
-                            Width="60"
-                            Background="Transparent"
-                            BorderBrush="Gray"
-                            Foreground="White"
-                            Margin="0,0,10,0"/>
-                    <Button Content="发消息"
-                            Width="100"
-                            Background="#0078D7"
-                            BorderBrush="#0078D7"
-                            Foreground="White"
-                            Click="Button_Click"/>
-                </StackPanel>
-            </StackPanel>
-        </Grid>
+
+
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="240"/>
+      <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="48"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+      <AutoSuggestBox Margin="8"
+                      PlaceholderText="搜索"
+                      GettingFocus="AutoSuggestBox_GettingFocus"
+                      LosingFocus="AutoSuggestBox_LosingFocus"/>
+      <Grid Grid.Row="1"
+            x:Name="ContactGrid">
+          <!--好友列表-->
+        <ListView
+          x:Name="UserListView"
+          ItemsSource="{x:Bind ContactsCvs.View, Mode=OneWay}"
+          ItemTemplate="{StaticResource ContactListViewTemplate}"
+          SelectionChanged="ListView_SelectionChanged">
+          <ListView.ItemsPanel>
+            <ItemsPanelTemplate>
+              <ItemsStackPanel AreStickyGroupHeadersEnabled="False"/>
+            </ItemsPanelTemplate>
+          </ListView.ItemsPanel>
+          <ListView.GroupStyle>
+            <GroupStyle>
+              <GroupStyle.HeaderTemplate>
+                <DataTemplate x:DataType="models:GroupInfoList">
+                  <Border AutomationProperties.AccessibilityView="Raw">
+                    <TextBlock Text="{x:Bind Key}"
+                               Style="{ThemeResource TitleTextBlockStyle}"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                  </Border>
+                </DataTemplate>
+              </GroupStyle.HeaderTemplate>
+            </GroupStyle>
+          </ListView.GroupStyle>
+        </ListView>
+      </Grid>
+      <Grid x:Name="NewContactGrid"
+            Grid.Row="1"
+            Background="Transparent"
+            Visibility="Collapsed">
+        <ListBox SelectionChanged="ListBox_SelectionChanged"
+                 Background="Transparent">
+          <x:String>用户</x:String>
+          <x:String>群聊</x:String>
+        </ListBox>
+      </Grid>
     </Grid>
+    <Border Width="1"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            Grid.Column="1"/>
+    <Grid x:Name="UserInfromation"
+          Grid.Column="2">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+
+      <!-- 用户信息 -->
+      <StackPanel Grid.Row="0"
+                  Margin="20"
+                  Orientation="Horizontal">
+        <Ellipse Width="50"
+                 Height="50"
+                   VerticalAlignment="Center"
+  HorizontalAlignment="Center"
+                 Margin="0,0,0,10">
+          <Ellipse.Fill>
+                        <ImageBrush ImageSource="{x:Bind ContactPageViewModel.User.ProfilePicture, Converter={StaticResource ByteArrayToImageConverter}, Mode=OneWay}"/>
+          </Ellipse.Fill>
+        </Ellipse>
+        <StackPanel VerticalAlignment="Stretch"
+                    Margin="20,8">
+          <TextBlock Text="{x:Bind ContactPageViewModel.User.Username, Mode=TwoWay}"
+                     Foreground="White"
+                     FontSize="16"/>
+        </StackPanel>
+      </StackPanel>
+
+      <!-- 简介和举报 -->
+      <StackPanel x:Name="Stake1"
+                  Grid.Row="1"
+                  Margin="20">
+        <Line Stroke="AliceBlue"
+              X1="0"
+              Loaded="LineElement_Loaded"
+              StrokeThickness="2"/>
+        <TextBlock Text="简介"
+                   Foreground="White"
+                   FontSize="14"
+                   Margin="0,10,0,5"/>
+        <TextBlock Text="服务器繁忙，请稍后再试..."
+                   Foreground="White"
+                   FontSize="12"/>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+          <Button Content="举报"
+                  Width="60"
+                  Background="Transparent"
+                  BorderBrush="Gray"
+                  Foreground="White"
+                  Margin="0,0,10,0"/>
+          <Button Content="分享"
+                  Width="60"
+                  Background="Transparent"
+                  BorderBrush="Gray"
+                  Foreground="White"
+                  Margin="0,0,10,0"/>
+          <Button Content="发消息"
+                  Width="100"
+                  Background="#0078D7"
+                  BorderBrush="#0078D7"
+                  Foreground="White"
+                  Click="Button_Click"/>
+        </StackPanel>
+      </StackPanel>
+    </Grid>
+  </Grid>
 </Page>

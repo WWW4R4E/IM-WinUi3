@@ -1,53 +1,56 @@
-﻿// App.xaml.cs
+﻿using System;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using IMWinUi.Models;
 using IMWinUi.Services;
+using IMWinUi.ViewModels;
 using IMWinUi.Views;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace IMWinUi
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     public partial class App : Application
     {
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
         public NavigationService NavigationService { get; private set; }
 
         public App()
         {
+            // 初始化服务容器
+            var services = new ServiceCollection();
+
+            // 配置 DbContext
+            services.AddDbContext<LocalDbcontext>(options =>
+            {
+                var projectDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var dbPath = System.IO.Path.Combine(projectDirectory, "localMIContext.db");
+                options.UseSqlite($"Data Source={dbPath}");
+            }, ServiceLifetime.Transient);
+
+            // 配置 Ioc.Default
+            Ioc.Default.ConfigureServices(services.BuildServiceProvider());
+
             this.InitializeComponent();
         }
 
-        /// <summary>
-        /// Invoked when the application is launched.
-        /// </summary>
-        /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            // 确保数据库和表被创建
-            using (var context = new LocalDbcontext())
-            {
-                context.Database.EnsureCreated();
-            }
-            //if (string.IsNullOrWhiteSpace(Properties.Settings.Default.LastUserName) & string.IsNullOrWhiteSpace(Properties.Settings.Default.LastUserPassword))
-            //{
-            //m_window = new LoginWindow();
-            m_window = new MainWindow();
-            m_window.Activate();
-            //}
-            //else
-            //{
-            //    m_window = new MainWindow();
-            //    m_window.Activate();
-            //}
+            var context = Ioc.Default.GetRequiredService<LocalDbcontext>();
+            context.Database.EnsureCreated();
+
+            // 创建窗口实例后操作
+            m_window = new LoginWindow();
+            var windowAppWindow = m_window.AppWindow; // 获取Window的AppWindow属性
+
+            // 配置窗口属性
+            var presenter = OverlappedPresenter.Create();
+            windowAppWindow.SetPresenter(presenter);
+            windowAppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 470, Height = 680 });
+
+            m_window.Activate(); // 移动到配置完成后激活窗口
         }
+
 
         public Window? m_window;
     }

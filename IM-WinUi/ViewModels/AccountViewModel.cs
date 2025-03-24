@@ -13,7 +13,6 @@ namespace IMWinUi.ViewModels
 
         public AccountViewModel()
         {
-            Debug.WriteLine("AccountViewModel 构造函数被调用。");
             _ = InitializeAsync();
         }
 
@@ -27,7 +26,7 @@ namespace IMWinUi.ViewModels
             // 注册登录结果回调
             _hubConnection.On<bool, string, string>("LoginResult", (success, message, jwtToken) =>
             {
-                if (_loginTaskCompletionSource != null && !_loginTaskCompletionSource.Task.IsCompleted)
+                if (!_loginTaskCompletionSource.Task.IsCompleted)
                 {
                     if (success)
                     {
