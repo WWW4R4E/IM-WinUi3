@@ -39,17 +39,17 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Comment" Content="Menu Item1" Tag="CommentPage">
                     <NavigationViewItem.InfoBadge>
-                        <InfoBadge x:Name="CommentinfoBadge" Value="5" />
+                        <InfoBadge x:Name="CommentinfoBadge" Value="{x:Bind MainWindowVIewModel.CommentBadgeCount}" />
                     </NavigationViewItem.InfoBadge>
                 </NavigationViewItem>
                 <NavigationViewItem Icon="Contact" Content="Menu Item2" Tag="ContactPage" >
                     <NavigationViewItem.InfoBadge>
-                        <InfoBadge x:Name="ContactinfoBadge" Value="5" />
+                        <InfoBadge x:Name="ContactinfoBadge" Value="{x:Bind MainWindowVIewModel.ContactBadgeCount}" />
                     </NavigationViewItem.InfoBadge>
                 </NavigationViewItem>
                 <NavigationViewItem Icon="Favorite" Content="Menu Item3" Tag="FavoritePage">
                     <NavigationViewItem.InfoBadge>
-                        <InfoBadge x:Name="FavoriteinfoBadge" Value="5" />
+                        <InfoBadge x:Name="FavoriteinfoBadge" Value="{x:Bind MainWindowVIewModel.FavoriteBadgeCount}" />
                     </NavigationViewItem.InfoBadge>
                 </NavigationViewItem>
             </NavigationView.MenuItems>

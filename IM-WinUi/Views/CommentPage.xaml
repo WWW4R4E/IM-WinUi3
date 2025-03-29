@@ -8,6 +8,7 @@
     xmlns:local="using:IMWinUi.Views" 
     xmlns:converter="using:IMWinUi.Converter"
     mc:Ignorable="d"    
+    
     >
     <Page.Resources>
         <converter:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>

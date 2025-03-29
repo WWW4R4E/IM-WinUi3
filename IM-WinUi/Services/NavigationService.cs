@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using System.Linq;
 
@@ -21,7 +22,6 @@ namespace IMWinUi.Services
             var selectedItem = _navigationView.MenuItems
                 .OfType<NavigationViewItem>()
                 .FirstOrDefault(item => item.Tag?.ToString() == pageTag);
-            _navigationView.SelectedItem = selectedItem;
 
             // 导航到对应页面
             Type? pageType = Type.GetType($"IMWinUi.Views.{pageTag}");

@@ -8,15 +8,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IMWinUi.ViewModels
+namespace IMWinUi.Services
 {
-    internal class ChatClientViewModel
+    internal class ChatClientService
     {
         private HubConnection _hubConnection;
         private readonly string _jwtToken;
-        public event EventHandler<MessageSentEventArgs> MessageSent;
+        public event EventHandler<MessageReceiveEventArgs> MessageSent;
 
-        public ChatClientViewModel()
+        public ChatClientService()
         {
             _jwtToken = Properties.Settings.Default.JwtToken;
             _ = InitializeAsync();
@@ -24,7 +24,7 @@ namespace IMWinUi.ViewModels
 
         private async Task InitializeAsync()
         {
-            Debug.WriteLine("开始初始化 HubConnection...");
+            Debug.WriteLine("开始初始化 Chat HubConnection...");
 
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:5287/ChatHub", options =>
@@ -38,7 +38,6 @@ namespace IMWinUi.ViewModels
 
             try
             {
-                Debug.WriteLine("尝试启动 HubConnection...");
                 await _hubConnection.StartAsync();
 
                 // 检查连接状态以确认是否成功连接
@@ -80,12 +79,13 @@ namespace IMWinUi.ViewModels
             content.CreateMessage(message);
 
             Debug.WriteLine("消息已保存到数据库。");
-            OnMessageSent(new MessageSentEventArgs { Success = true });
+            OnMessageReceive(new MessageReceiveEventArgs { Success = true });
 
         }
 
-        protected virtual void OnMessageSent(MessageSentEventArgs e)
+        protected virtual void OnMessageReceive(MessageReceiveEventArgs e)
         {
+            Debug.WriteLine(1);
             MessageSent(this, e);
         }
 
@@ -115,7 +115,7 @@ namespace IMWinUi.ViewModels
         }
     }
     // 定义事件参数类
-    public class MessageSentEventArgs : EventArgs
+    public class MessageReceiveEventArgs : EventArgs
     {
         public bool Success { get; init; }
     }

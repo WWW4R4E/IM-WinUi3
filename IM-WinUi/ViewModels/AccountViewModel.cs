@@ -18,7 +18,7 @@ namespace IMWinUi.ViewModels
 
         public async Task InitializeAsync()
         {
-            Debug.WriteLine("开始初始化 HubConnection...");
+            Debug.WriteLine("开始初始化Account HubConnection...");
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:5287/AccountHub") // 修复 URL 路径
                 .Build();
@@ -30,13 +30,11 @@ namespace IMWinUi.ViewModels
                 {
                     if (success)
                     {
-                        Debug.WriteLine("用户登录成功。");
                         JwtToken = jwtToken; // 存储JWT令牌
                         _loginTaskCompletionSource.SetResult(true);
                     }
                     else
                     {
-                        Debug.WriteLine($"用户登录失败: {message}");
                         _loginTaskCompletionSource.SetResult(false);
                     }
                 }
@@ -44,7 +42,6 @@ namespace IMWinUi.ViewModels
 
             try
             {
-                Debug.WriteLine("尝试启动 HubConnection...");
                 await _hubConnection.StartAsync();
 
                 // 检查连接状态以确认是否成功连接

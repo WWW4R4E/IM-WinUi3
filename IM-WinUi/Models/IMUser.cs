@@ -21,5 +21,5 @@ namespace IMWinUi.Models
         public string Username { get; set; }
         public byte[] ProfilePicture { get; set; }
 
-    }
+    } 
 }

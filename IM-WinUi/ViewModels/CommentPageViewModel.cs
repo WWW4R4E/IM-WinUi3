@@ -4,7 +4,6 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using IMWinUi.Models;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace IMWinUi.ViewModels
 {
@@ -35,11 +34,6 @@ namespace IMWinUi.ViewModels
         partial void OnUsersChanged(ObservableCollection<IMUser> value)
         {
             InitializeCommentLists();
-        }
-
-        partial void OnSelectUserChanged(IMUser value)
-        {
-            Debug.WriteLine($"切换了用户{value.Username}");
         }
 
 

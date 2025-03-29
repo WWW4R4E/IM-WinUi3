@@ -75,7 +75,6 @@ namespace ChatRoomASP.Hubs
         _logger.LogInformation("尝试发送消息");
         // 向接收者发送消息
         await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", messageJson);
-        // await Clients.Caller.SendAsync("SendMessageSuccess", message);
       }
       // else
       // {

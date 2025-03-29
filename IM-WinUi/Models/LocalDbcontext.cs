@@ -81,5 +81,12 @@ namespace IMWinUi.Models
                 .ToList();
             return users;
         }
+
+        internal int GetNewMessageCount(string lastUserName)
+        {
+            var result = IMMessages
+                .Count(m => (m.SenderName == lastUserName | m.ReceiverName == lastUserName) && m.IsRead == false);
+            return result;
+        }
     }
 }

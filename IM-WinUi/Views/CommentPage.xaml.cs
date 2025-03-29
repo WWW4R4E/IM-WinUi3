@@ -8,23 +8,25 @@ using System.Diagnostics;
 using System.Linq;
 using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
+using IMWinUi.Services;
 
 namespace IMWinUi.Views
 {
     public sealed partial class CommentPage
     {
-        private readonly ChatClientViewModel _chatClient = new();
-        internal CommentPageViewModel CommentPageViewModel { get; } = new();
+        internal ChatClientService ChatClient;
+        internal CommentPageViewModel CommentPageViewModel;
 
         public CommentPage()
         {
             InitializeComponent();
             InitializeWebView();
-            _chatClient.MessageSent += ChatClient_MessageSent!;
+            CommentPageViewModel = new CommentPageViewModel();
+            ChatClient = Ioc.Default.GetRequiredService<ChatClientService>();
+            ChatClient.MessageSent += ChatClient_MessageSent;
         }
-
+            
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -67,7 +69,7 @@ namespace IMWinUi.Views
             try
             {
                 Debug.WriteLine("正在尝试发送消息");
-                await _chatClient.SendMessageAsync(iMMessage); // 使用await等待异步操作完成
+                await ChatClient.SendMessageAsync(iMMessage); // 使用await等待异步操作完成
             }
             catch (Exception ex)
             {
@@ -77,7 +79,7 @@ namespace IMWinUi.Views
 
 
         // 将新消息添加进聊天记录
-        private void ChatClient_MessageSent(object sender, MessageSentEventArgs e)
+        private void ChatClient_MessageSent(object sender, MessageReceiveEventArgs e)
         {
             if (e.Success)
             {
@@ -122,6 +124,12 @@ namespace IMWinUi.Views
         {
             var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
             var newMessages = content.GetIMMessages(Properties.Settings.Default.LastUserName, user);
+            foreach (var message in newMessages)
+            {
+                message.IsRead = true;
+            }
+            content.SaveChanges();
+
             CommentPageViewModel.Messages = newMessages;
 
         }
@@ -141,7 +149,6 @@ namespace IMWinUi.Views
             if (sender is ListView listView && listView.SelectedItem is CommentListItem item)
             {
                 CommentPageViewModel.SelectUser = item.user;
-                Debug.WriteLine(item.user.Username);
                 RefreshChatMessages(CommentPageViewModel.SelectUser.Username);
             }
         }
