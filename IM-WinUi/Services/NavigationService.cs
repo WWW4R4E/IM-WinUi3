@@ -29,6 +29,7 @@ namespace IMWinUi.Services
             {
                 throw new InvalidOperationException($"无法找到页面类型: IMWinUi.Views.{pageTag}");
             }
+            _navigationView.SelectedItem = selectedItem;
             _contentFrame.Navigate(pageType, data);
         }
 

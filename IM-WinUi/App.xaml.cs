@@ -13,7 +13,6 @@ namespace IMWinUi
 {
     public partial class App : Application
     {
-        public NavigationService NavigationService { get; private set; }
         public ServiceCollection Services = new();
 
         public App()
@@ -27,14 +26,18 @@ namespace IMWinUi
                 options.UseSqlite($"Data Source={dbPath}");
             }, ServiceLifetime.Transient);
             Services.AddSingleton<ChatClientService>();
-
+            // 注册 NavigationService 的工厂方法(返回null，实际实例将在MainWindow中创建)
+            Services.AddSingleton(provider =>
+            {
+                return (NavigationService)null!;
+            });
             // 配置 Ioc.Default
             Ioc.Default.ConfigureServices(Services.BuildServiceProvider());
 
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             var context = Ioc.Default.GetRequiredService<LocalDbcontext>();
             context.Database.EnsureCreated();
@@ -46,7 +49,7 @@ namespace IMWinUi
             // 配置窗口属性
             var presenter = OverlappedPresenter.Create();
             windowAppWindow.SetPresenter(presenter);
-            windowAppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 470, Height = 680 });
+            windowAppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 680, Height = 880 });
 
             m_window.Activate(); 
         }

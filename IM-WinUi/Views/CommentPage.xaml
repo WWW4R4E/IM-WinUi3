@@ -7,6 +7,7 @@
     xmlns:model="using:IMWinUi.Models" 
     xmlns:local="using:IMWinUi.Views" 
     xmlns:converter="using:IMWinUi.Converter"
+    NavigationCacheMode="Enabled"
     mc:Ignorable="d"    
     
     >

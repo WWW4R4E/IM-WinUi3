@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Window
     x:Class="IMWinUi.Views.SearchWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:IMWinUi.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
@@ -14,7 +12,7 @@
     <StackPanel>
         <Grid x:Name="Title"
                 Height="32">
-            <TextBlock Text="全网搜索"
+            <TextBlock Text="搜索"
                     VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
         <!-- 搜索栏 -->

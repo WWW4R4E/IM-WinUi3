@@ -25,20 +25,28 @@ namespace IMWinUi.Views
             CommentPageViewModel = new CommentPageViewModel();
             ChatClient = Ioc.Default.GetRequiredService<ChatClientService>();
             ChatClient.MessageSent += ChatClient_MessageSent;
+
         }
-            
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+
             var data = e.Parameter;
             if (data != null && data is IMUser user)
             {
-                if (CommentPageViewModel.Users.All(x => x != user))
+                if (CommentPageViewModel.Users.All(x => x.Username != user.Username))
                 {
                     CommentPageViewModel.Users.Add(user);
                 }
-                CommentPageViewModel.SelectUser = user;
+                else
+                {
+                    Console.WriteLine("用户已存在：" + user.Username);
+                }
+
+                UserListBox.SelectedIndex =
+                    CommentPageViewModel.Users.IndexOf(
+                        CommentPageViewModel.Users.FirstOrDefault(x => x.Username == user.Username));
             }
         }
 
@@ -65,7 +73,8 @@ namespace IMWinUi.Views
                 return;
             }
 
-            var iMMessage = new IMMessage(MessageType.Text, Properties.Settings.Default.LastUserName, CommentPageViewModel.SelectUser.Username, ChatInput.Text);
+            var iMMessage = new IMMessage(MessageType.Text, Properties.Settings.Default.LastUserName,
+                CommentPageViewModel.SelectUser.Username, ChatInput.Text);
             try
             {
                 Debug.WriteLine("正在尝试发送消息");
@@ -128,20 +137,17 @@ namespace IMWinUi.Views
             {
                 message.IsRead = true;
             }
+
             content.SaveChanges();
 
             CommentPageViewModel.Messages = newMessages;
-
         }
 
         private void GetNewChatMessages(string user)
         {
             var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
             var newMessage = content.GetLatestMessageBetweenUsers(Properties.Settings.Default.LastUserName, user);
-            DispatcherQueue.TryEnqueue(() =>
-            {
-                CommentPageViewModel.Messages.Add(newMessage);
-            });
+            DispatcherQueue.TryEnqueue(() => { CommentPageViewModel.Messages.Add(newMessage); });
         }
 
         private void ListView_SelectChanged(object sender, SelectionChangedEventArgs e)

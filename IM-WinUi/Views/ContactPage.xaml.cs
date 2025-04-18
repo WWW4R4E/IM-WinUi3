@@ -1,9 +1,11 @@
-﻿using IMWinUi.Models;
+﻿using System;
+using IMWinUi.Models;
 using IMWinUi.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Shapes;
 using System.Diagnostics;
+using System.Linq;
 
 namespace IMWinUi.Views
 {
@@ -45,7 +47,7 @@ namespace IMWinUi.Views
             var listbox = sender as ListBox;
             if (listbox!.SelectedIndex != -1)
             {
-                var searchWindow = new SearchWindow();
+                var searchWindow = new SearchWindow(listbox.SelectedIndex);
                 searchWindow.Activate();
                 listbox.SelectedIndex = -1;
             }

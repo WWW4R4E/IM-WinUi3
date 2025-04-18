@@ -23,37 +23,11 @@ public sealed partial class LoginWindow : Window
         SystemBackdrop = new MicaBackdrop { Kind = MicaKind.BaseAlt };
         ExtendsContentIntoTitleBar = true;
         InitializeComponent();
-        // // 获取窗口句柄
-        // var hWnd = WindowNative.GetWindowHandle(this);
-        // var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
-        //
-        // // 获取 AppWindow
-        // var appWindow = AppWindow.GetFromWindowId(windowId);
-        //
-        // if (appWindow != null)
-        // {
-        //     // 设置窗口大小
-        //     var width = 470;
-        //     var height = 680;
-        //     appWindow.Resize(new SizeInt32(width, height));
-        //
-        //     // 获取显示器的工作区域
-        //     var displayArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
-        //     var workArea = displayArea.WorkArea;
-        //
-        //     // 计算居中位置
-        //     var x = (workArea.Width - width) / 2 + workArea.X;
-        //     var y = (workArea.Height - height) / 2 + workArea.Y;
-        //
-        //     // 移动窗口到居中位置
-        //     appWindow.MoveAndResize(new RectInt32(x, y, width, height));
-        Debug.WriteLine(_rememberLogin);
         if (_rememberLogin)
         {
             UserNameTextBox.Text = Settings.Default.LastUserName;
             PasswordBoxWithRevealMode.Password = Settings.Default.LastUserPassword;
         }
-        // }
     }
 
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -61,7 +35,7 @@ public sealed partial class LoginWindow : Window
         if (string.IsNullOrWhiteSpace(UserNameTextBox.Text) &
             string.IsNullOrWhiteSpace(PasswordBoxWithRevealMode.Password))
         {
-            _ = ShowDiaglog.ShowMessage("提示", "用户名和密码不能为空");
+            ShowDiaglog.ShowMessage("提示", "用户名和密码不能为空",this.Content.XamlRoot);
         }
         else
         {
@@ -96,7 +70,7 @@ public sealed partial class LoginWindow : Window
             }
             else
             {
-                _ = ShowDiaglog.ShowMessage("提示", "登录失败，请检查用户名和密码或与服务器的网络连接。");
+                ShowDiaglog.ShowMessage("提示", "登录失败，请检查用户名和密码或与服务器的网络连接。",this.Content.XamlRoot);
             }
         }
     }

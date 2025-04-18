@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Window
     x:Class="IMWinUi.Views.LoginWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,52 +6,53 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="LoginWindow">
-    <StackPanel>
-        <Image Source="/Assets/logo.jpg"
-       HorizontalAlignment="Center"
-       Margin="0,40,0,0"
-       Width="100"
-       Height="100"/>
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel>
+            <Image Source="/Assets/logo.jpg"
+                   HorizontalAlignment="Center"
+                   Margin="0,40,0,0"
+                   Width="100"
+                   Height="100" />
 
-        <StackPanel VerticalAlignment="Stretch"
-             HorizontalAlignment="Center">
-            <StackPanel Orientation="Vertical">
-                <!-- 账号输入框 -->
-                <TextBlock Text="账号："
-                        VerticalAlignment="Top"
-                        HorizontalAlignment="Left"/>
-                <TextBox Name="UserNameTextBox"
-                      VerticalAlignment="Top"
-                      Width="250"/>
+            <StackPanel VerticalAlignment="Stretch"
+                        HorizontalAlignment="Center">
+                <StackPanel Orientation="Vertical">
+                    <!-- 账号输入框 -->
+                    <TextBlock Text="账号："
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left" />
+                    <TextBox Name="UserNameTextBox"
+                             VerticalAlignment="Top"
+                             Width="250" />
+                </StackPanel>
+                <!-- 密码输入框 -->
+                <StackPanel Orientation="Vertical"
+                            Margin="0,20,0,0">
+                    <TextBlock Text="密码："
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left" />
+                    <PasswordBox Name="PasswordBoxWithRevealMode" Width="250" Margin="0,0,8,0"
+                                 PasswordRevealMode="Hidden" />
+
+                    <CheckBox Name="RevealModeCheckBox1" Content="显示密码" IsChecked="False"
+                              Checked="RevealModeCheckbox_Changed" Unchecked="RevealModeCheckbox_Changed" />
+                    <CheckBox Content="记住登录" IsChecked="{x:Bind _rememberLogin,Mode=TwoWay}" />
+                </StackPanel>
+                <!-- 登录按钮 -->
+                <Button
+                    Content="登录"
+                    HorizontalAlignment="Center"
+                    Width="75"
+                    Margin="0,20"
+                    Click="LoginButton_Click" />
+
+                <!-- 注册和找回密码链接 -->
+                <Grid>
+                    <Button Content="注册用户" Click="RegisterButton_Click" HorizontalAlignment="Left" />
+                    <Button Content="找回密码" Click="RetrieveButton_Click" HorizontalAlignment="Right" />
+                </Grid>
             </StackPanel>
-            <!-- 密码输入框 -->
-            <StackPanel Orientation="Vertical"
-                 Margin="0,20,0,0">
-                <TextBlock Text="密码："
-                        VerticalAlignment="Top"
-                        HorizontalAlignment="Left"/>
-                <PasswordBox Name="PasswordBoxWithRevealMode" Width="250" Margin="0,0,8,0"
-    PasswordRevealMode="Hidden"/>
 
-                <CheckBox Name="RevealModeCheckBox1" Content="显示密码" IsChecked="False"
-    Checked="RevealModeCheckbox_Changed" Unchecked="RevealModeCheckbox_Changed"/>
-                <CheckBox Content="记住登录" IsChecked="{x:Bind _rememberLogin,Mode=TwoWay}"
-                />
-            </StackPanel>
-            <!-- 登录按钮 -->
-            <Button
-                Content="登录"
-                 HorizontalAlignment="Center"
-                 Width="75"
-                 Margin="0,20"
-                 Click="LoginButton_Click"/>
-
-            <!-- 注册和找回密码链接 -->
-            <Grid>
-                <Button Content="注册用户" Click="RegisterButton_Click" HorizontalAlignment="Left"/>
-                <Button Content="找回密码" Click="RetrieveButton_Click" HorizontalAlignment="Right"/>
-            </Grid>
         </StackPanel>
-
-    </StackPanel>
+    </Grid>
 </Window>
