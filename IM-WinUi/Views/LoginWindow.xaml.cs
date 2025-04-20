@@ -15,7 +15,7 @@ namespace IMWinUi.Views;
 
 public sealed partial class LoginWindow : Window
 {
-    private readonly AccountViewModel _accountViewModel = new();
+    private readonly AccountService _accountService = new();
     private bool _rememberLogin = Settings.Default.Remember;
 
     public LoginWindow()
@@ -40,7 +40,7 @@ public sealed partial class LoginWindow : Window
         else
         {
             var loginResult =
-                await _accountViewModel.LoginAsync(UserNameTextBox.Text, PasswordBoxWithRevealMode.Password);
+                await _accountService.LoginAsync(UserNameTextBox.Text, PasswordBoxWithRevealMode.Password);
 
             if (loginResult)
             {
@@ -53,7 +53,7 @@ public sealed partial class LoginWindow : Window
                     Settings.Default.LastUserPassword = PasswordBoxWithRevealMode.Password;
                     Settings.Default.Remember = true;
                     // 保存JWT令牌到设置
-                    Settings.Default.JwtToken = _accountViewModel.JwtToken;
+                    Settings.Default.JwtToken = _accountService.JwtToken;
                 }
                 else
                 {

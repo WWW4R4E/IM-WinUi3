@@ -1,12 +1,10 @@
-﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using IMWinUi.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace IMWinUi.Services
 {
@@ -24,7 +22,7 @@ namespace IMWinUi.Services
 
         private async Task InitializeAsync()
         {
-            Debug.WriteLine("开始初始化 Chat HubConnection...");
+            Debug.WriteLine("开始初始化聊天");
 
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:5287/ChatHub", options =>
@@ -33,6 +31,9 @@ namespace IMWinUi.Services
                 })
                 .Build();
 
+            // 添加Hub连接关闭事件监听
+            _hubConnection.Closed += async (error) => await StartConnectionAsync();
+
             _hubConnection.On<string>("ReceiveMessage", ReceiveMessage);
             _hubConnection.On<Task>("SendMessageFailed", SendMessageFailed);
 
@@ -40,7 +41,6 @@ namespace IMWinUi.Services
             {
                 await _hubConnection.StartAsync();
 
-                // 检查连接状态以确认是否成功连接
                 Debug.WriteLine(_hubConnection.State == HubConnectionState.Connected
                     ? "HubConnection 已成功启动。"
                     : $"HubConnection 启动失败，当前状态: {_hubConnection.State}");
@@ -48,22 +48,37 @@ namespace IMWinUi.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"启动 HubConnection 失败: {ex.Message}");
-                // TODO 实现服务器重连
-                //await ShowDiaglog.ShowMessage("提示", "连接服务器失败，请检查网络连接。");
-                //while (_hubConnection.State != HubConnectionState.Connected)
-                //{
-                //    try
-                //    {
-                //        await _hubConnection.StartAsync();
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        Debug.WriteLine($"重试连接失败: {e.Message}");
-                //    }
-                //}
+                // 调用重连逻辑
+                await StartConnectionAsync();
             }
         }
 
+        // 新增重连方法
+        private async Task StartConnectionAsync()
+        {
+            int retryCount = 0;
+            const int maxRetryCount = 5;
+            const int initialDelay = 2000; // 初始延迟2秒
+            int retryDelay = initialDelay;
+
+            while (_hubConnection?.State != HubConnectionState.Connected && retryCount < maxRetryCount)
+            {
+                try
+                {
+                    await _hubConnection.StartAsync();
+                    retryCount = 0; // 重置计数器
+                    Debug.WriteLine("重新连接成功");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    retryCount++;
+                    retryDelay = initialDelay * (int)Math.Pow(2, retryCount); // 指数退避
+                    Debug.WriteLine($"重连失败，第{retryCount}次尝试，将在{retryDelay}毫秒后重试: {ex.Message}");
+                    await Task.Delay(retryDelay);
+                }
+            }
+        }
 
         private void ReceiveMessage(string messageJson)
         {

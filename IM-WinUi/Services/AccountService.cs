@@ -1,27 +1,30 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace IMWinUi.ViewModels
 {
-    internal class AccountViewModel
+    internal class AccountService
     {
         private HubConnection _hubConnection;
         private TaskCompletionSource<bool> _loginTaskCompletionSource;
         public string JwtToken { get; private set; } // 添加JWT令牌属性
 
-        public AccountViewModel()
+        public AccountService()
         {
             _ = InitializeAsync();
         }
 
-        public async Task InitializeAsync()
+        private async Task InitializeAsync()
         {
             Debug.WriteLine("开始初始化Account HubConnection...");
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:5287/AccountHub") // 修复 URL 路径
                 .Build();
+
+            // 添加Hub连接关闭事件监听
+            _hubConnection.Closed += async (error) => await StartConnectionAsync();
 
             // 注册登录结果回调
             _hubConnection.On<bool, string, string>("LoginResult", (success, message, jwtToken) =>
@@ -57,6 +60,8 @@ namespace IMWinUi.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"启动 HubConnection 失败: {ex.Message}");
+                // 新增：初始化失败时触发重连
+                await StartConnectionAsync();
             }
         }
 
@@ -79,6 +84,33 @@ namespace IMWinUi.ViewModels
             {
                 Debug.WriteLine($"用户登录失败: {ex.Message}");
                 return false;
+            }
+        }
+
+        // 重连方法
+        private async Task StartConnectionAsync()
+        {
+            int retryCount = 0;
+            const int maxRetryCount = 5;
+            const int initialDelay = 2000; // 初始延迟2秒
+            int retryDelay = initialDelay;
+
+            while (_hubConnection?.State != HubConnectionState.Connected && retryCount < maxRetryCount)
+            {
+                try
+                {
+                    await _hubConnection.StartAsync();
+                    retryCount = 0;
+                    Debug.WriteLine("AccountHub重新连接成功");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    retryCount++;
+                    retryDelay = initialDelay * (int)Math.Pow(2, retryCount); // 指数退避
+                    Debug.WriteLine($"AccountHub重连失败，第{retryCount}次尝试，将在{retryDelay}ms后重试: {ex.Message}");
+                    await Task.Delay(retryDelay);
+                }
             }
         }
     }

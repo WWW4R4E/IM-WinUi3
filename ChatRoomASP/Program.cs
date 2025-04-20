@@ -92,6 +92,7 @@ app.UseAuthorization();
 // 注册SignalR Hub
 app.MapHub<ChatHub>("/chatHub");
 app.MapHub<AccountHub>("/accountHub");
+app.MapHub<SearchHub>("/searchhub");
 
 app.MapStaticAssets();
 

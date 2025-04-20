@@ -2,7 +2,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ChatRoomASP.Controllers;
 using ChatRoomASP.Models;
 using Microsoft.AspNetCore.SignalR;
 
@@ -10,10 +9,10 @@ namespace ChatRoomASP.Hubs
 {
     public class AccountHub : Hub
     {
-        private readonly ILogger<AccountController> _logger;
+        private readonly ILogger<AccountHub> _logger;
         private readonly AppDbContext _context;
 
-        public AccountHub(ILogger<AccountController> logger, AppDbContext context)
+        public AccountHub(ILogger<AccountHub> logger, AppDbContext context)
         {
             _logger = logger;
             _context = context;
@@ -37,17 +36,22 @@ namespace ChatRoomASP.Hubs
                 var token = new JwtSecurityToken(
                     issuer: null,
                     audience: null,
-                    claims: new[] { new Claim(ClaimTypes.Name, user.UserName) },
+                    claims: new[] 
+                    { 
+                        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
+                    },
                     expires: DateTime.Now.AddHours(1),
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                 );
                 var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
                 await Clients.Client(Context.ConnectionId).SendAsync("LoginResult", true, "成功", jwtToken);
+                _logger.LogInformation("用户 {UserName} 登录成功", user.UserName);
             }
             else
             {
                 // 登录失败，返回错误信息
                 await Clients.Client(Context.ConnectionId).SendAsync("LoginResult", false, "用户名或密码错误", null);
+                _logger.LogInformation("用户 {UserName} 登录失败", user.UserName);
             }
         }
     }

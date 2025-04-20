@@ -101,6 +101,7 @@ namespace ChatRoomASP.Migrations
                 name: "IX_UserRelations_UserId2",
                 table: "UserRelations",
                 column: "UserId2");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS [AspNetUsers]");
         }
 
         /// <inheritdoc />
