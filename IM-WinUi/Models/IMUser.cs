@@ -7,7 +7,7 @@ namespace IMWinUi.Models
     {
         public IMUser(int userId, string userName)
         {
-            this.UserId = userId;
+            UserId = userId;
             this.Username = userName;
         }
 

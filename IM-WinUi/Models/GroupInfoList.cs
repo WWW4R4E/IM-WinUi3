@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace IMWinUi.Models
 {
@@ -12,10 +8,5 @@ namespace IMWinUi.Models
         {
         }
         public object Key { get; set; }
-
-        //public override string ToString()
-        //{
-        //    return "Group " + Key.ToString();
-        //}
     }
 }

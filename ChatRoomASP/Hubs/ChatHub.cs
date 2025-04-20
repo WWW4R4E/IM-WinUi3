@@ -12,7 +12,7 @@ namespace ChatRoomASP.Hubs
   public class ChatHub : Hub
   {
     private readonly AppDbContext _context;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly ILogger<ChatHub> _logger;
     // private readonly IRabbitMqClient _rabbitMqClient;
 
@@ -23,7 +23,7 @@ namespace ChatRoomASP.Hubs
     //     _rabbitMqClient = rabbitMqClient;
     //     _logger = logger;
     // }
-    public ChatHub(AppDbContext context, UserManager<ApplicationUser> userManager, ILogger<ChatHub> logger)
+    public ChatHub(AppDbContext context, UserManager<User> userManager, ILogger<ChatHub> logger)
     {
       _context = context;
       _userManager = userManager;
@@ -38,7 +38,7 @@ namespace ChatRoomASP.Hubs
       if (user != null)
       {
         // 将用户的 ID 和连接 ID 存储在字典中
-        _context.UserConnections[user.Id] = Context.ConnectionId;
+        _context.UserConnections[user.UserId] = Context.ConnectionId;
         // 调用基类的 OnConnectedAsync 方法
         await base.OnConnectedAsync();
       }
@@ -51,7 +51,7 @@ namespace ChatRoomASP.Hubs
       if (user != null)
       {
         // 从字典中移除用户的 ID 和连接 ID
-        _context.UserConnections.TryRemove(user.Id, out _);
+        _context.UserConnections.TryRemove(user.UserId, out _);
         // 调用基类的 OnDisconnectedAsync 方法
         await base.OnDisconnectedAsync(exception);
       }
@@ -70,7 +70,7 @@ namespace ChatRoomASP.Hubs
       var receiver = await _userManager.FindByNameAsync(message.ReceiverName);
 
       // 尝试通过 SignalR 发送消息
-      if (_context.UserConnections.TryGetValue(receiver.Id, out var receiverConnectionId))
+      if (_context.UserConnections.TryGetValue(receiver.UserId, out var receiverConnectionId))
       {
         _logger.LogInformation("尝试发送消息");
         // 向接收者发送消息

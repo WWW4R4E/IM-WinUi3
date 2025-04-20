@@ -1,24 +1,19 @@
+using System.Security.Claims;
 using ChatRoomASP.Models;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace ChatRoomASP.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly AppDbContext _context;
 
-        public AccountController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            ILogger<AccountController> logger)
+        public AccountController(ILogger<AccountController> logger, AppDbContext context)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _logger = logger;
+            _context = context;
         }
 
         [HttpGet]
@@ -32,20 +27,22 @@ namespace ChatRoomASP.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Name, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                var user = new User
+                    { UserName = model.Name, Email = model.Email, PasswordHash = Password.HashPassword(model.Password) };
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                // 手动实现登录逻辑（如设置 Cookie）
+                var claims = new List<Claim>
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation("创建了新用户和密码");
-                    return RedirectToAction("Index", "Home");
-                }
-                Console.WriteLine("注册用户失败");
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                    _logger.LogError($"注册失败: {error.Description}"); // 添加日志记录
-                }
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Email, user.Email)
+                };
+                var identity = new ClaimsIdentity(claims, "CookieAuth");
+                var principal = new ClaimsPrincipal(identity);
+                await HttpContext.SignInAsync("CookieAuth", principal);
+
+                _logger.LogInformation("创建了新用户和密码");
+                return RedirectToAction("Index", "Home");
             }
 
             return View(model);
@@ -62,29 +59,52 @@ namespace ChatRoomASP.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Name, model.Password, model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
+                // 查找用户
+                var user = _context.Users.FirstOrDefault(u => u.UserName == model.Name);
+                if (user != null && Password.VerifyPassword(model.Password, user.PasswordHash))
                 {
+                    // 创建 Claims
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.UserName),
+                        new Claim(ClaimTypes.Email, user.Email)
+                    };
+
+                    // 创建 ClaimsIdentity
+                    var identity = new ClaimsIdentity(claims, "CookieAuth");
+
+                    // 创建 ClaimsPrincipal
+                    var principal = new ClaimsPrincipal(identity);
+
+                    // 登录用户（设置 Cookie）
+                    await HttpContext.SignInAsync("CookieAuth", principal, new AuthenticationProperties
+                    {
+                        IsPersistent = model.RememberMe // 是否持久化 Cookie
+                    });
+
                     _logger.LogInformation("用户登入");
                     return RedirectToAction("Index", "Home");
                 }
                 else
                 {
-                    _logger.LogWarning(result.ToString());
+                    _logger.LogWarning("无效的登录尝试");
                     ModelState.AddModelError(string.Empty, "无效的登录尝试");
                     return View(model);
                 }
-
             }
+
             return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
             _logger.LogInformation("用户已登录");
             return RedirectToAction("Index", "Home");
         }
+
+
+
     }
 }

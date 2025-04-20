@@ -10,12 +10,12 @@ namespace IMWinUi.Models
     {
         public IMMessage(MessageType type, string senderName, string receiverName, string content)
         {
-            this.Type = type;
-            this.SenderName = senderName;
-            this.ReceiverName = receiverName;
-            this.Content = content;
-            this.SentAt = DateTime.Now;
-            this.IsRead = false;
+            Type = type;
+            SenderName = senderName;
+            ReceiverName = receiverName;
+            Content = content;
+            SentAt = DateTime.Now;
+            IsRead = false;
         }
 
         [Key] // 主键

@@ -1,13 +1,7 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Hosting;
 using ChatRoomASP.Hubs;
 using ChatRoomASP.Models;
 using Microsoft.EntityFrameworkCore;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -36,19 +30,16 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 添加身份验证服务
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    options.User.AllowedUserNameCharacters = null;
-    options.Password.RequireDigit = true; // 要求数字
-    options.Password.RequireLowercase = true; // 要求小写字母
-    options.Password.RequireUppercase = true; // 要求大写字母
-    options.Password.RequireNonAlphanumeric = false; // 要求特殊字符
-    options.Password.RequiredLength = 8;
+// 添加 Cookie 认证服务
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", options =>
+    {
+        options.LoginPath = "/Account/Login"; // 登录页面路径
+        options.AccessDeniedPath = "/Account/AccessDenied"; // 无权限页面路径
+    });
 
-})
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+// 添加授权服务
+builder.Services.AddAuthorization();
 
 // 配置 JWT 令牌
 builder.Services.AddAuthentication(options =>

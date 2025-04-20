@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using ChatRoomASP.Models;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Data.Sqlite; // 添加 Sqlite 命名空间引用
 
 namespace ChatRoomASP.Controllers
