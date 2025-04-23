@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ChatRoomASP.Models;
 
-public class LoginModel
+public class LoginViewModel
 {
     [Required]
     public string Name { get; set; }

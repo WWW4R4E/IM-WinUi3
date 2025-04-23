@@ -1,32 +1,40 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ChatRoomASP.Models;
 
-public class UserRelation
-{
+public class UserRelation {
   [Key]
-  [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-  public int UserRelationId { get; set; } // 修改为主键
+  public long UserRelationId { get; set; } // 改为long
+    
+  [Required]
+  public long InitiatorUserId { get; set; } // 明确发起方
+    
+  [Required]
+  public long TargetUserId { get; set; } // 明确目标方
+    
+  [Required]
+  public int RelationTypeId { get; set; } // 新增外键字段
+  
+  public RelationType RelationType { get; set; }  // 添加导航属性 RelationType（引用 RelationType 实体）
 
-  [Required] public int UserId1 { get; set; }
-  [Required] public int UserId2 { get; set; }
-  [Required] public int RelationTypeId { get; set; }
-
-  [Required] public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-  [Required] public DateTime UpdatedAt { get; set; } = DateTime.Now;
-  [ForeignKey("UserId1")] public IMUser User1 { get; set; }
-  [ForeignKey("UserId2")] public IMUser User2 { get; set; }
-  [ForeignKey("RelationTypeId")] public RelationType RelationType { get; set; }
+    
+  [MaxLength(50)]
+  public string RemarkName { get; set; } // 新增
+    
+  [Required]
+  public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
+    
+  [Required]
+  public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.Now;
+    
+  [ForeignKey("InitiatorUserId")]
+  public IMUser InitiatorUser { get; set; } // 重命名
+    
+  [ForeignKey("TargetUserId")]
+  public IMUser TargetUser { get; set; }
+  
 }
 
-public class RelationType
-{
-  [Key]
-  [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-  public int RelationTypeId { get; set; }
 
-  [Required][MaxLength(50)] public string Name { get; set; }
 
-  public ICollection<UserRelation> UserRelations { get; set; }
-}

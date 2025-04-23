@@ -19,7 +19,7 @@ public class SearchHub : Hub
   public async Task SearchUser(string searchTerm)
   {
     // 查询用户名匹配的结果
-    var nameResults = await _context.Users
+    var nameResults = await _context.IMUsers
         .Where(u => u.UserName == searchTerm)
         .Select(u => new { u.UserId, u.UserName, u.ProfilePicture })
         .ToListAsync();
@@ -28,7 +28,7 @@ public class SearchHub : Hub
     var idResults = new List<dynamic>();
     if (int.TryParse(searchTerm, out int userId))
     {
-      idResults = await _context.Users
+      idResults = await _context.IMUsers
           .Where(u => u.UserId == userId)
           .Select(u => new { u.UserId, u.UserName, u.ProfilePicture })
           .ToListAsync<dynamic>();

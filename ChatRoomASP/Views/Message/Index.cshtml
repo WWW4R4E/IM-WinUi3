@@ -21,10 +21,10 @@
                 @Html.DisplayNameFor(model => model.Type)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SenderName)
+                @Html.DisplayNameFor(model => model.Sender.UserName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ReceiverName)
+                @Html.DisplayNameFor(model => model.Receiver.UserName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Content)
@@ -33,7 +33,7 @@
                 @Html.DisplayNameFor(model => model.SentAt)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsRead)
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th></th>
         </tr>
@@ -49,10 +49,10 @@
                     @Html.DisplayFor(modelItem => item.Type)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.SenderName)
+                    @Html.DisplayFor(modelItem => item.Sender.UserName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ReceiverName)
+                    @Html.DisplayFor(modelItem => item.Receiver.UserName)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Content)
@@ -61,7 +61,7 @@
                     @Html.DisplayFor(modelItem => item.SentAt)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IsRead)
+                    @Html.DisplayFor(modelItem => item.Status)
                 </td>
             </tr>
         }

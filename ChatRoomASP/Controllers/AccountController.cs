@@ -29,7 +29,7 @@ namespace ChatRoomASP.Controllers
             {
                 var user = new IMUser
                 { UserName = model.Name, Email = model.Email, PasswordHash = Password.HashPassword(model.Password) };
-                _context.Users.Add(user);
+                _context.IMUsers.Add(user);
                 await _context.SaveChangesAsync();
                 // 手动实现登录逻辑（如设置 Cookie）
                 var claims = new List<Claim>
@@ -55,13 +55,13 @@ namespace ChatRoomASP.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginModel model)
+        public async Task<IActionResult> Login(LoginViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
                 // 查找用户
-                var user = _context.Users.FirstOrDefault(u => u.UserName == model.Name);
-                if (user != null && Password.VerifyPassword(model.Password, user.PasswordHash))
+                var user = _context.IMUsers.FirstOrDefault(u => u.UserName == viewModel.Name);
+                if (user != null && Password.VerifyPassword(viewModel.Password, user.PasswordHash))
                 {
                     // 创建 Claims
                     var claims = new List<Claim>
@@ -79,7 +79,7 @@ namespace ChatRoomASP.Controllers
                     // 登录用户（设置 Cookie）
                     await HttpContext.SignInAsync("CookieAuth", principal, new AuthenticationProperties
                     {
-                        IsPersistent = model.RememberMe // 是否持久化 Cookie
+                        IsPersistent = viewModel.RememberMe // 是否持久化 Cookie
                     });
 
                     _logger.LogInformation("用户登入");
@@ -89,11 +89,11 @@ namespace ChatRoomASP.Controllers
                 {
                     _logger.LogWarning("无效的登录尝试");
                     ModelState.AddModelError(string.Empty, "无效的登录尝试");
-                    return View(model);
+                    return View(viewModel);
                 }
             }
 
-            return View(model);
+            return View(viewModel);
         }
 
 

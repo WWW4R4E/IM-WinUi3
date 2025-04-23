@@ -14,14 +14,14 @@
         <span asp-validation-for="Type" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="SenderName" class="control-label">发送者名称</label>
-        <input asp-for="SenderName" class="form-control" />
-        <span asp-validation-for="SenderName" class="text-danger"></span>
+        <label asp-for="Sender.UserName" class="control-label">发送者名称</label>
+        <input asp-for="Sender.UserName" class="form-control" />
+        <span asp-validation-for="Sender.UserName" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="ReceiverName" class="control-label">接收者名称</label>
-        <input asp-for="ReceiverName" class="form-control" />
-        <span asp-validation-for="ReceiverName" class="text-danger"></span>
+        <label asp-for="Receiver.UserName" class="control-label">接收者名称</label>
+        <input asp-for="Receiver.UserName" class="form-control" />
+        <span asp-validation-for="Receiver.UserName" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Content" class="control-label">消息内容</label>
@@ -32,11 +32,6 @@
         <label asp-for="SentAt" class="control-label">发送时间</label>
         <input asp-for="SentAt" class="form-control" />
         <span asp-validation-for="SentAt" class="text-danger"></span>
-    </div>
-    <div class="form-group form-check">
-        <label class="form-check-label">
-            <input class="form-check-input" asp-for="IsRead" /> @Html.DisplayNameFor(model => model.IsRead)
-        </label>
     </div>
     <div class="form-group">
         <input type="submit" value="创建" class="btn btn-primary" />

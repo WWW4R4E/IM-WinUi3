@@ -52,11 +52,11 @@ namespace ChatRoomASP.Hubs
             try
             {
                 // 尝试通过 SignalR 直接发送消息
-                await Clients.User(message.ReceiverName).SendAsync("ReceiveMessage", messageJson);
+                await Clients.User(message.Receiver.UserId.ToString()).SendAsync("ReceiveMessage", messageJson);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("用户 {ReceiverName} 离线，无法发送消息：{Message}", message.ReceiverName, ex.Message);
+                _logger.LogWarning("用户 {ReceiverName} 离线，无法发送消息：{Message}", message.Receiver.UserName, ex.Message);
 
                 // 如果接收者离线，将消息发布到消息队列（预留功能）
                 // var messageBytes = Encoding.UTF8.GetBytes(messageJson);

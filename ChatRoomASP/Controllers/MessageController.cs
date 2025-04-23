@@ -30,7 +30,7 @@ namespace ChatRoomASP.Controllers
 
     public ActionResult Users()
     {
-      var users = _context.Users.ToList(); // 假设数据库存在 Users 表
+      var users = _context.IMUsers.ToList(); // 假设数据库存在 Users 表
       return View(users);
     }
 
