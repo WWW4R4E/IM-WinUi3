@@ -90,7 +90,7 @@ namespace IMWinUi.Services
                 throw new ArgumentNullException(nameof(message), "反序列化后的消息为 null。");
             }
 
-            var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
+            var content = Ioc.Default.GetRequiredService<LocalDbContext>();
             content.CreateMessage(message);
 
             Debug.WriteLine("消息已保存到数据库。");
@@ -100,7 +100,6 @@ namespace IMWinUi.Services
 
         protected virtual void OnMessageReceive(MessageReceiveEventArgs e)
         {
-            Debug.WriteLine(1);
             MessageSent(this, e);
         }
 

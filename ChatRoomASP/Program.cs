@@ -90,9 +90,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // 注册SignalR Hub
-app.MapHub<ChatHub>("/chatHub");
-app.MapHub<AccountHub>("/accountHub");
-app.MapHub<SearchHub>("/searchhub");
+app.MapHub<ChatHub>("/ChatHub");
+app.MapHub<AccountHub>("/AccountHub");
+app.MapHub<SearchHub>("/Searchhub");
 
 app.MapStaticAssets();
 

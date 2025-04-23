@@ -82,5 +82,16 @@ namespace IMWinUi.Properties {
                 this["JwtToken"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.DateTime LastSyncTime {
+            get {
+                return ((global::System.DateTime)(this["LastSyncTime"]));
+            }
+            set {
+                this["LastSyncTime"] = value;
+            }
+        }
     }
 }

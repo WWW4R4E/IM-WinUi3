@@ -54,5 +54,15 @@ namespace ChatRoomASP.Hubs
                 _logger.LogInformation("用户 {UserName} 登录失败", user.UserName);
             }
         }
+        public async Task GetDatabaseUpdates(DateTime lastUpdate)
+        {
+            var updates1 = _context.IMMessages
+                .Where(m => m.SentAt > lastUpdate && (m.ReceiverName == Context.User.Identity.Name || m.SenderName == Context.User.Identity.Name))
+                .ToList();
+            var updates2 = _context.UserRelations
+                .Where(r => r.User1.UserName == Context.User.Identity.Name || r.User2.UserName == Context.User.Identity.Name)
+                .ToList();
+            await Clients.Caller.SendAsync("HandleDatabaseUpdates", updates1, updates2);
+        }
     }
 }

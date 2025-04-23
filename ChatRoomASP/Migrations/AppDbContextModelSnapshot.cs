@@ -49,23 +49,7 @@ namespace ChatRoomASP.Migrations
                     b.ToTable("IMMessages");
                 });
 
-            modelBuilder.Entity("ChatRoomASP.Models.RelationType", b =>
-                {
-                    b.Property<int>("RelationTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("RelationTypeId");
-
-                    b.ToTable("RelationTypes");
-                });
-
-            modelBuilder.Entity("ChatRoomASP.Models.User", b =>
+            modelBuilder.Entity("ChatRoomASP.Models.IMUser", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -81,6 +65,10 @@ namespace ChatRoomASP.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<byte[]>("ProfilePicture")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -89,6 +77,22 @@ namespace ChatRoomASP.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ChatRoomASP.Models.RelationType", b =>
+                {
+                    b.Property<int>("RelationTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("RelationTypeId");
+
+                    b.ToTable("RelationTypes");
                 });
 
             modelBuilder.Entity("ChatRoomASP.Models.UserRelation", b =>
@@ -132,13 +136,13 @@ namespace ChatRoomASP.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ChatRoomASP.Models.User", "User1")
+                    b.HasOne("ChatRoomASP.Models.IMUser", "User1")
                         .WithMany("UserRelations1")
                         .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ChatRoomASP.Models.User", "User2")
+                    b.HasOne("ChatRoomASP.Models.IMUser", "User2")
                         .WithMany("UserRelations2")
                         .HasForeignKey("UserId2")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -151,16 +155,16 @@ namespace ChatRoomASP.Migrations
                     b.Navigation("User2");
                 });
 
-            modelBuilder.Entity("ChatRoomASP.Models.RelationType", b =>
-                {
-                    b.Navigation("UserRelations");
-                });
-
-            modelBuilder.Entity("ChatRoomASP.Models.User", b =>
+            modelBuilder.Entity("ChatRoomASP.Models.IMUser", b =>
                 {
                     b.Navigation("UserRelations1");
 
                     b.Navigation("UserRelations2");
+                });
+
+            modelBuilder.Entity("ChatRoomASP.Models.RelationType", b =>
+                {
+                    b.Navigation("UserRelations");
                 });
 #pragma warning restore 612, 618
         }

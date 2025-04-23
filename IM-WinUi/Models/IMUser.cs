@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IMWinUi.Models
 {
-    internal class IMUser
+    public class IMUser
     {
         public IMUser(int userId, string userName)
         {
             UserId = userId;
-            this.Username = userName;
+            UserName = userName;
         }
 
         private IMUser()
@@ -18,7 +18,7 @@ namespace IMWinUi.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
-        public string Username { get; set; }
+        public string UserName { get; set; }
         public byte[] ProfilePicture { get; set; }
 
     } 

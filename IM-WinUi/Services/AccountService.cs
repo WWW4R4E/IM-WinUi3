@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using IMWinUi.Models;
 
 namespace IMWinUi.ViewModels
 {
@@ -9,6 +12,8 @@ namespace IMWinUi.ViewModels
     {
         private HubConnection _hubConnection;
         private TaskCompletionSource<bool> _loginTaskCompletionSource;
+        private LocalDbContext db = Ioc.Default.GetRequiredService<LocalDbContext>();
+        public event EventHandler<UpdateDbEventArgs> OnUpdateDb;
         public string JwtToken { get; private set; } // 添加JWT令牌属性
 
         public AccountService()
@@ -23,8 +28,6 @@ namespace IMWinUi.ViewModels
                 .WithUrl("http://localhost:5287/AccountHub") // 修复 URL 路径
                 .Build();
 
-            // 添加Hub连接关闭事件监听
-            _hubConnection.Closed += async (error) => await StartConnectionAsync();
 
             // 注册登录结果回调
             _hubConnection.On<bool, string, string>("LoginResult", (success, message, jwtToken) =>
@@ -88,7 +91,7 @@ namespace IMWinUi.ViewModels
         }
 
         // 重连方法
-        private async Task StartConnectionAsync()
+        internal async Task StartConnectionAsync()
         {
             int retryCount = 0;
             const int maxRetryCount = 5;
@@ -113,5 +116,29 @@ namespace IMWinUi.ViewModels
                 }
             }
         }
+
+        public async Task GetDatabaseUpdatesAsync(DateTime defaultLastSyncTime)
+        {
+            await _hubConnection.InvokeAsync("GetDatabaseUpdates", defaultLastSyncTime);
+        }
+        
+        private async Task HandleDatabaseUpdates(List<IMMessage> update1 , List<IMUser> update2)
+        {
+            try
+            {
+                db.UpdateImMessages(update1);
+                db.UpdateImUsers(update2);
+                OnUpdateDb?.Invoke(this, new UpdateDbEventArgs { Success = true });
+            }
+            catch
+            {
+                Debug.WriteLine("同步数据库时出错");
+            }
+        }
+    }
+
+    internal class UpdateDbEventArgs:EventArgs
+    {
+        public bool Success { get; set; }
     }
 }

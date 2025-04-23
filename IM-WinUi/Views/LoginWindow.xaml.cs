@@ -1,27 +1,30 @@
-﻿using System.Diagnostics;
-using Windows.Graphics;
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using IMWinUi.Helper;
+using IMWinUi.Models;
 using IMWinUi.Properties;
 using IMWinUi.ViewModels;
-using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using WinRT.Interop;
 
 namespace IMWinUi.Views;
 
 public sealed partial class LoginWindow : Window
 {
-    private readonly AccountService _accountService = new();
+    private readonly AccountService _accountService;
     private bool _rememberLogin = Settings.Default.Remember;
+    LocalDbContext db = Ioc.Default.GetRequiredService<LocalDbContext>();
 
     public LoginWindow()
     {
-        SystemBackdrop = new MicaBackdrop { Kind = MicaKind.BaseAlt };
         ExtendsContentIntoTitleBar = true;
+        SystemBackdrop = new MicaBackdrop { Kind = MicaKind.BaseAlt };
+        _accountService = Ioc.Default.GetRequiredService<AccountService>();
+        _accountService.OnUpdateDb += ToCommentPage;
         InitializeComponent();
         if (_rememberLogin)
         {
@@ -29,13 +32,13 @@ public sealed partial class LoginWindow : Window
             PasswordBoxWithRevealMode.Password = Settings.Default.LastUserPassword;
         }
     }
-
+    
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(UserNameTextBox.Text) &
             string.IsNullOrWhiteSpace(PasswordBoxWithRevealMode.Password))
         {
-            ShowDiaglog.ShowMessage("提示", "用户名和密码不能为空",this.Content.XamlRoot);
+            ShowDiaglog.ShowMessage("提示", "用户名和密码不能为空", this.Content.XamlRoot);
         }
         else
         {
@@ -63,16 +66,43 @@ public sealed partial class LoginWindow : Window
                 Debug.WriteLine("最终" + _rememberLogin);
                 Settings.Default.Save();
 
-                var currentApp = (App)Application.Current;
-                currentApp.m_window = new MainWindow();
-                currentApp.m_window.Activate();
-                Close();
+                // 同步数据库
+                await SyncDatabase();
+
+                if (db.IMUsers.Count() == 0)
+                {
+                    db.AddUser(new IMUser(1, UserNameTextBox.Text));
+                }
+
+                // var currentApp = (App)Application.Current;
+                // currentApp.m_window = new MainWindow();
+                // currentApp.m_window.Activate();
+                // Close();
             }
             else
             {
-                ShowDiaglog.ShowMessage("提示", "登录失败，请检查用户名和密码或与服务器的网络连接。",this.Content.XamlRoot);
+                ShowDiaglog.ShowMessage("提示", "登录失败，请检查用户名和密码或与服务器的网络连接。", this.Content.XamlRoot);
+                _accountService.StartConnectionAsync();
             }
         }
+    }
+
+    private void ToCommentPage(object? sender, UpdateDbEventArgs e)
+    {
+        var currentApp = (App)Application.Current;
+        currentApp.m_window = new MainWindow();
+        currentApp.m_window.Activate();
+        Close();
+    }
+
+
+    private async Task SyncDatabase()
+    {
+        // 从服务器获取增量数据
+        await _accountService.GetDatabaseUpdatesAsync(Settings.Default.LastSyncTime);
+        // 更新最后同步时间
+        Settings.Default.LastSyncTime = DateTime.UtcNow;
+        Settings.Default.Save();
     }
 
     private void RegisterButton_Click(object sender, RoutedEventArgs e)

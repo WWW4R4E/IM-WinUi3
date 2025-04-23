@@ -1,6 +1,10 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices.JavaScript;
+using System.Text.Json;
 using System.Threading.Tasks;
+using IMWinUi.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.UI.Xaml.Controls;
 
@@ -8,6 +12,7 @@ namespace IMWinUi.Services;
 
 public class SearchService
 {
+    public event Action<SearchResult> OnSearchResultReceived;
     private HubConnection _hubConnection;
 
     public SearchService()
@@ -19,18 +24,32 @@ public class SearchService
     {
         Debug.WriteLine("初始化搜索服务");
         _hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:5001/search")
+            .WithUrl("http://localhost:5287/Searchhub")
             .Build();
-        // 监听服务器返回的搜索结果
-        _hubConnection.On<object>("SearchResult", result =>
+
+        // 将On方法的参数类型改为object以接收不同类型结果
+        _hubConnection.On<string>("SearchResult", result =>
         {
-            if (result is string message)
+            try
             {
-                Debug.WriteLine($"搜索失败: {message}");
+                // 尝试将 result 反序列化为 List<IMUser> 对象
+                var users = JsonSerializer.Deserialize<List<IMUser>>(result);
+                OnSearchResultReceived?.Invoke(new SearchResult
+                {
+                    Success = true,
+                    Type = "IMUserList",
+                    Result = users
+                });
             }
-            else
+            catch (JsonException)
             {
-                Debug.WriteLine($"搜索成功: {result}");
+                // 反序列化失败，说明 result 是错误消息
+                OnSearchResultReceived?.Invoke(new SearchResult
+                {
+                    Success = false,
+                    Type = "Error",
+                    Result = result
+                });
             }
         });
 
@@ -38,25 +57,13 @@ public class SearchService
         await _hubConnection.StartAsync();
     }
 
-    // 搜索用户名
-    public async Task SearchUserName(string name)
+    // 搜索用户
+    public async Task SearchUser(string searchTerm)
     {
         if (_hubConnection.State == HubConnectionState.Connected)
         {
-            await _hubConnection.SendAsync("SearchUserName", name);
-        }
-        else
-        {
-            Debug.WriteLine("SignalR 连接未建立，无法发送搜索请求。");
-        }
-    }
-
-    // 搜索用户 ID
-    public async Task SearchUserId(int id)
-    {
-        if (_hubConnection.State == HubConnectionState.Connected)
-        {
-            await _hubConnection.SendAsync("SearchUserId", id);
+            await _hubConnection.SendAsync("SearchUser", searchTerm);
+            Debug.WriteLine("发送搜索请求：" + searchTerm);
         }
         else
         {

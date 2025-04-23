@@ -24,13 +24,6 @@ namespace ChatRoomASP.Hubs
             _logger = logger;
         }
 
-        //
-        // 发送私聊消息
-        public async Task SendPrivateMessage(string receiverId, string message)
-        {
-            await Clients.User(receiverId).SendAsync("ReceivePrivateMessage", Context.UserIdentifier, message);
-        }
-
         // 加入群组
         public async Task JoinGroup(string groupId)
         {

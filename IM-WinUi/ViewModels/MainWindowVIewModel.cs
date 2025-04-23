@@ -30,7 +30,7 @@ namespace IMWinUi.ViewModels
 
         private int GetNewMessageCount()
         {
-            var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
+            var content = Ioc.Default.GetRequiredService<LocalDbContext>();
             var newMessageCount = content.GetNewMessageCount(Properties.Settings.Default.LastUserName);
             return newMessageCount;
         }

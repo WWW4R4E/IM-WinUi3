@@ -8,9 +8,7 @@
     xmlns:local="using:IMWinUi.Views" 
     xmlns:converter="using:IMWinUi.Converter"
     NavigationCacheMode="Enabled"
-    mc:Ignorable="d"    
-    
-    >
+    mc:Ignorable="d"    >
     <Page.Resources>
         <converter:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
         <!-- 定义四种 DataTemplate -->
@@ -83,7 +81,7 @@
                     </Ellipse.Fill>
                 </Ellipse>
                 <TextBlock Grid.Column="1"
-                    Text="{x:Bind user.Username}"
+                    Text="{x:Bind user.UserName}"
                     x:Phase="1"
                     Style="{ThemeResource BaseTextBlockStyle}"
                     Margin="12,6,0,0"/>

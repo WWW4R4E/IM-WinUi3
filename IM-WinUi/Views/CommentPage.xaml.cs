@@ -25,7 +25,6 @@ namespace IMWinUi.Views
             CommentPageViewModel = new CommentPageViewModel();
             ChatClient = Ioc.Default.GetRequiredService<ChatClientService>();
             ChatClient.MessageSent += ChatClient_MessageSent;
-
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -35,18 +34,18 @@ namespace IMWinUi.Views
             var data = e.Parameter;
             if (data != null && data is IMUser user)
             {
-                if (CommentPageViewModel.Users.All(x => x.Username != user.Username))
+                if (CommentPageViewModel.Users.All(x => x.UserName != user.UserName))
                 {
                     CommentPageViewModel.Users.Add(user);
                 }
                 else
                 {
-                    Console.WriteLine("用户已存在：" + user.Username);
+                    Console.WriteLine("用户已存在：" + user.UserName);
                 }
 
                 UserListBox.SelectedIndex =
                     CommentPageViewModel.Users.IndexOf(
-                        CommentPageViewModel.Users.FirstOrDefault(x => x.Username == user.Username));
+                        CommentPageViewModel.Users.FirstOrDefault(x => x.UserName == user.UserName));
             }
         }
 
@@ -67,14 +66,8 @@ namespace IMWinUi.Views
 
         private async void sendTextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (CommentPageViewModel.SelectUser == null)
-            {
-                Debug.WriteLine("请选择一个用户发送消息。");
-                return;
-            }
-
             var iMMessage = new IMMessage(MessageType.Text, Properties.Settings.Default.LastUserName,
-                CommentPageViewModel.SelectUser.Username, ChatInput.Text);
+                CommentPageViewModel.SelectUser.UserName, ChatInput.Text);
             try
             {
                 Debug.WriteLine("正在尝试发送消息");
@@ -94,7 +87,7 @@ namespace IMWinUi.Views
             {
                 DispatcherQueue.TryEnqueue(() =>
                 {
-                    GetNewChatMessages(CommentPageViewModel.SelectUser.Username);
+                    GetNewChatMessages(CommentPageViewModel.SelectUser.UserName);
                     ChatInput.Text = string.Empty;
                 });
             }
@@ -131,21 +124,20 @@ namespace IMWinUi.Views
 
         private void RefreshChatMessages(string user)
         {
-            var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
+            var content = Ioc.Default.GetRequiredService<LocalDbContext>();
             var newMessages = content.GetIMMessages(Properties.Settings.Default.LastUserName, user);
-            foreach (var message in newMessages)
-            {
-                message.IsRead = true;
-            }
 
-            content.SaveChanges();
+            // 标记消息为已读
+            content.MarkMessagesAsRead(newMessages);
 
+            // 更新 ViewModel 中的消息列表
             CommentPageViewModel.Messages = newMessages;
         }
 
+
         private void GetNewChatMessages(string user)
         {
-            var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
+            var content = Ioc.Default.GetRequiredService<LocalDbContext>();
             var newMessage = content.GetLatestMessageBetweenUsers(Properties.Settings.Default.LastUserName, user);
             DispatcherQueue.TryEnqueue(() => { CommentPageViewModel.Messages.Add(newMessage); });
         }
@@ -155,7 +147,7 @@ namespace IMWinUi.Views
             if (sender is ListView listView && listView.SelectedItem is CommentListItem item)
             {
                 CommentPageViewModel.SelectUser = item.user;
-                RefreshChatMessages(CommentPageViewModel.SelectUser.Username);
+                RefreshChatMessages(CommentPageViewModel.SelectUser.UserName);
             }
         }
     }

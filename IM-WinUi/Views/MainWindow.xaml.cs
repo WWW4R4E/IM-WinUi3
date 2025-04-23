@@ -17,7 +17,7 @@ using System.Diagnostics;
      internal MainWindowVIewModel MainWindowVIewModel { get; }
      public MainWindow()
      {
-         this.InitializeComponent();
+         InitializeComponent();
          ExtendsContentIntoTitleBar = true;
          SetTitleBar(AppTitleBar);
         NavigationService = new NavigationService(ContentFrame, Imnv);

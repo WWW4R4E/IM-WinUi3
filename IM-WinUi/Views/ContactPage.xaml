@@ -39,7 +39,7 @@
                 </Ellipse>
 
                 <TextBlock Grid.Row="0" Grid.Column="1"
-                           Text="{x:Bind Username}"
+                           Text="{x:Bind UserName}"
                            x:Phase="1"
                            Style="{ThemeResource BaseTextBlockStyle}"
                            Margin="12,6,0,0" />
@@ -170,7 +170,7 @@
                 </Ellipse>
                 <StackPanel VerticalAlignment="Stretch"
                             Margin="20,8">
-                    <TextBlock Text="{x:Bind ContactPageViewModel.User.Username, Mode=TwoWay}"
+                    <TextBlock Text="{x:Bind ContactPageViewModel.User.UserName, Mode=TwoWay}"
                                Foreground="White"
                                FontSize="16" />
                 </StackPanel>

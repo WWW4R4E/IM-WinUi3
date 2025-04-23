@@ -27,8 +27,8 @@ namespace ChatRoomASP.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User
-                    { UserName = model.Name, Email = model.Email, PasswordHash = Password.HashPassword(model.Password) };
+                var user = new IMUser
+                { UserName = model.Name, Email = model.Email, PasswordHash = Password.HashPassword(model.Password) };
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
                 // 手动实现登录逻辑（如设置 Cookie）

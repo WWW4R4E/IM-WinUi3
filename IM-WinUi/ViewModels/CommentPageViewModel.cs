@@ -9,24 +9,19 @@ namespace IMWinUi.ViewModels
 {
     internal partial class CommentPageViewModel : ObservableObject
     {
-        [ObservableProperty]
-        private ObservableCollection<IMUser> _users;
+        [ObservableProperty] private ObservableCollection<IMUser> _users;
 
-        [ObservableProperty]
-        private ObservableCollection<IMMessage> _messages;
+        [ObservableProperty] private ObservableCollection<IMMessage> _messages;
 
-        [ObservableProperty]
-        private string _chatInput;
+        [ObservableProperty] private string _chatInput;
 
-        [ObservableProperty]
-        private IMUser _selectUser;
+        [ObservableProperty] private IMUser _selectUser;
 
-        [ObservableProperty]
-        private ObservableCollection<CommentListItem> _commentLists = new();
+        [ObservableProperty] private ObservableCollection<CommentListItem> _commentLists = new();
 
         public CommentPageViewModel()
         {
-            var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
+            var content = Ioc.Default.GetRequiredService<LocalDbContext>();
             Users = content.GetHistoryImUsers();
             InitializeCommentLists();
         }
@@ -48,19 +43,18 @@ namespace IMWinUi.ViewModels
                 return;
             }
 
-            var content = Ioc.Default.GetRequiredService<LocalDbcontext>();
-            var Message = content.IMMessages;
+            var content = Ioc.Default.GetRequiredService<LocalDbContext>();
+            var message = content.IMMessages;
             foreach (var user in Users)
             {
-                var latestMessage = Message
-                    .Where(m =>
-                        (m.SenderName == loginUser && m.ReceiverName == user.Username) ||
-                        (m.SenderName == user.Username && m.ReceiverName == loginUser)
+                var latestMessage = message
+                    .Find(m =>
+                        (m.SenderName == loginUser && m.ReceiverName == user.UserName) ||
+                        (m.SenderName == user.UserName && m.ReceiverName == loginUser)
                     )
                     .OrderByDescending(msg => msg.SentAt)
                     .FirstOrDefault();
 
-                // 确保至少有一个消息存在才创建列表项
                 if (latestMessage != null)
                 {
                     CommentLists.Add(new CommentListItem { user = user, Message = latestMessage });

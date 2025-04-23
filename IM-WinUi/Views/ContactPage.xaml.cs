@@ -4,19 +4,37 @@ using IMWinUi.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Shapes;
-using System.Diagnostics;
 using System.Linq;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace IMWinUi.Views
 {
     public sealed partial class ContactPage
     {
-        internal ContactPageViewModel ContactPageViewModel = new();
+        internal ContactPageViewModel ContactPageViewModel;
         public ContactPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             ContactsCvs.Source = ContactPageViewModel.GetContactsGroupedAsync();
         }
+        
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            var data = e.Parameter;
+            if (data != null && data is IMUser user)
+            {
+                if (ContactPageViewModel.Friends.All(x => x.UserName != user.UserName))
+                {
+                    ContactPageViewModel.Friends.Add(user);
+                }
+
+                ContactPageViewModel.User =
+                    ContactPageViewModel.Friends.FirstOrDefault(x => x.UserName == user.UserName);
+            }
+        }
+        
         private void LineElement_Loaded(object sender, RoutedEventArgs e)
         {
             var line = sender as Line;

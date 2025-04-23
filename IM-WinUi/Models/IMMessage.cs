@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace IMWinUi.Models
 {
-    internal record class IMMessage
+    public record class IMMessage
     {
         public IMMessage(MessageType type, string senderName, string receiverName, string content)
         {

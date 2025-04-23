@@ -4,29 +4,100 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:models="using:IMWinUi.Models"
     mc:Ignorable="d"
     Title="Seaindow">
-    <Window.SystemBackdrop>
-        <MicaBackdrop/>
-    </Window.SystemBackdrop>
-    <StackPanel>
-        <Grid x:Name="Title"
-                Height="32">
-            <TextBlock Text="搜索"
-                    VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        </Grid>
-        <!-- 搜索栏 -->
-        <AutoSuggestBox x:Name="SearchBox"
-                    Margin="10"/>
 
-        <!-- 选项卡 -->
-        <NavigationView x:Name="NvSample" PaneDisplayMode="Top"
-    SelectionFollowsFocus="Enabled" IsBackButtonVisible="Collapsed" IsSettingsVisible="False">
-            <NavigationView.MenuItems>
-                <NavigationViewItem Icon="Play" Content="用户" x:Name="SamplePage1Item" />
-                <NavigationViewItem Icon="Save" Content="群聊" x:Name="SamplePage2Item" />
-            </NavigationView.MenuItems>
-            <Frame x:Name="ContentFrame"/>
-        </NavigationView>
-    </StackPanel>
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+    <Page>
+        <Page.Resources>
+            <DataTemplate x:Key="ContactListViewTemplate" x:DataType="models:IMUser">
+                <Grid Background="Transparent">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Ellipse x:Name="Ellipse"
+                             Grid.RowSpan="2"
+                             Width="32"
+                             Height="32"
+                             Margin="6"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center"
+                             Fill="{ThemeResource SystemControlBackgroundBaseMediumBrush}" />
+                    <TextBlock Grid.Column="1"
+                               Text="{x:Bind UserName}"
+                               x:Phase="1"
+                               Style="{ThemeResource BaseTextBlockStyle}"
+                               Margin="12,6,0,0" />
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="1"
+                               Text="{x:Bind  ProfilePicture}"
+                               x:Phase="2"
+                               Style="{ThemeResource BodyTextBlockStyle}"
+                               Margin="12,0,0,6" />
+                </Grid>
+            </DataTemplate>
+        </Page.Resources>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel>
+                <Grid x:Name="Title"
+                      Height="32">
+                    <TextBlock Text="搜索"
+                               VerticalAlignment="Center" HorizontalAlignment="Center" />
+                </Grid>
+
+            </StackPanel>
+            <Pivot x:Name="Pt"
+                   Grid.Row="1">
+                <PivotItem Header="用户">
+                    <Grid>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <!-- 搜索栏 -->
+                        <AutoSuggestBox
+                            Margin="10"
+                            QuerySubmitted="SearchBox_OnQuerySubmitted" />
+                        <ListView Grid.Row="1" SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemsSource="{x:Bind _searchViewModel.ResultUsers, Mode=OneWay}"
+                                  ItemTemplate="{StaticResource ContactListViewTemplate}"
+                                  ItemClick="ListViewBase_OnItemClick"
+                                  IsHoldingEnabled="False" />
+                    </Grid>
+                </PivotItem>
+                <PivotItem Header="群聊">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <AutoSuggestBox
+                            Margin="10"
+                            QuerySubmitted="SearchBox_OnQuerySubmitted" />
+                        <ListView Grid.Row="1"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemsSource="{x:Bind _searchViewModel.ResultMessages, Mode=OneWay}"
+                                  ItemTemplate="{StaticResource ContactListViewTemplate}"
+                                  ItemClick="ListViewBase_OnItemClick"
+                                  IsHoldingEnabled="False" />
+                    </Grid>
+                </PivotItem>
+            </Pivot>
+        </Grid>
+    </Page>
 </Window>

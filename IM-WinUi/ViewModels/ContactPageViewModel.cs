@@ -12,23 +12,21 @@ namespace IMWinUi.ViewModels
         private IMUser? _user; 
         [ObservableProperty] 
         private ObservableCollection<IMUser> _friends; 
-
-        #region 联系人分组方法
+        
         internal static ObservableCollection<GroupInfoList> GetContactsGroupedAsync()
         {
-            var content = Ioc.Default.GetRequiredService<LocalDbcontext>(); 
+            var content = Ioc.Default.GetRequiredService<LocalDbContext>(); 
             
-            var contacts = content.GetIMUsers();
+            var contacts = content.GetImUsers();
             
             var query = from item in contacts
-                        group item by item.Username.Substring(0, 1).ToUpper() 
+                        group item by item.UserName.Substring(0, 1).ToUpper() 
                         into g
                         orderby g.Key 
                         select new GroupInfoList(g) { Key = g.Key };
 
             return new ObservableCollection<GroupInfoList>(query); 
         }
-        #endregion
 
     }
 }

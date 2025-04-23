@@ -21,8 +21,6 @@ namespace IMWinUi.Helper
                 CloseButtonText = "OK",
                 XamlRoot = xamlRoot 
             };
-
-            Debug.WriteLine("显示消息框");
             ContentDialogResult result = await noWifiDialog.ShowAsync();
         }
     }
