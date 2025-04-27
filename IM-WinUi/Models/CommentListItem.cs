@@ -2,7 +2,7 @@
 {
     class CommentListItem
     {
-        public IMUser user;
-        public IMMessage Message;
+        public LocalUser user;
+        public LocalMessage? Message;
     }
 }

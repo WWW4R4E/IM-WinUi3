@@ -15,8 +15,8 @@ namespace IMWinUi.ViewModels
     public partial class SearchViewModel : ObservableObject
     {
         internal readonly SearchService _searchService;
-        [ObservableProperty] private List<IMUser> _resultUsers;
-        [ObservableProperty] private List<IMMessage> _resultMessages;
+        [ObservableProperty] private List<LocalUser> _resultUsers;
+        [ObservableProperty] private List<LocalMessage> _resultMessages;
         private readonly DispatcherQueue _dispatcherQueue;
 
         public SearchViewModel()
@@ -44,7 +44,7 @@ namespace IMWinUi.ViewModels
             {
                 case "IMUserList":
 
-                    _dispatcherQueue.TryEnqueue(() => { ResultUsers = result.Result as List<IMUser>; });
+                    _dispatcherQueue.TryEnqueue(() => { ResultUsers = result.Result as List<LocalUser>; });
                     break;
             }
         }

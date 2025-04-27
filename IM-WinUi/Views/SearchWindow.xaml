@@ -13,7 +13,8 @@
     </Window.SystemBackdrop>
     <Page>
         <Page.Resources>
-            <DataTemplate x:Key="ContactListViewTemplate" x:DataType="models:IMUser">
+            <!-- 用户列表模板 -->
+            <DataTemplate x:Key="UserListViewTemplate" x:DataType="models:LocalUser">
                 <Grid Background="Transparent">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -32,18 +33,19 @@
                              HorizontalAlignment="Center"
                              Fill="{ThemeResource SystemControlBackgroundBaseMediumBrush}" />
                     <TextBlock Grid.Column="1"
-                               Text="{x:Bind UserName}"
+                               Text="{x:Bind Username}"
                                x:Phase="1"
                                Style="{ThemeResource BaseTextBlockStyle}"
                                Margin="12,6,0,0" />
                     <TextBlock Grid.Column="1"
                                Grid.Row="1"
-                               Text="{x:Bind  ProfilePicture}"
+                               Text="{x:Bind   ProfilePicture}"
                                x:Phase="2"
                                Style="{ThemeResource BodyTextBlockStyle}"
                                Margin="12,0,0,6" />
                 </Grid>
             </DataTemplate>
+            <!-- 群组列表模板 -->
         </Page.Resources>
         <Grid>
             <Grid.RowDefinitions>

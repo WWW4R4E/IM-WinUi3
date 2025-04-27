@@ -25,13 +25,13 @@ namespace IMWinUi.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string LastUserName {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public long LastUserId {
             get {
-                return ((string)(this["LastUserName"]));
+                return ((long)(this["LastUserId"]));
             }
             set {
-                this["LastUserName"] = value;
+                this["LastUserId"] = value;
             }
         }
         
@@ -44,18 +44,6 @@ namespace IMWinUi.Properties {
             }
             set {
                 this["LastUserPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string Rem {
-            get {
-                return ((string)(this["Rem"]));
-            }
-            set {
-                this["Rem"] = value;
             }
         }
         

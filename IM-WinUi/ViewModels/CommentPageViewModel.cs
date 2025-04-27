@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
@@ -9,24 +8,23 @@ namespace IMWinUi.ViewModels
 {
     internal partial class CommentPageViewModel : ObservableObject
     {
-        [ObservableProperty] private ObservableCollection<IMUser> _users;
+        [ObservableProperty] private ObservableCollection<LocalUser> _users;
 
-        [ObservableProperty] private ObservableCollection<IMMessage> _messages;
+        [ObservableProperty] private ObservableCollection<LocalMessage> _messages;
 
         [ObservableProperty] private string _chatInput;
 
-        [ObservableProperty] private IMUser _selectUser;
-
-        [ObservableProperty] private ObservableCollection<CommentListItem> _commentLists = new();
+        [ObservableProperty] private LocalUser _selectUser;
+        [ObservableProperty] private ObservableCollection<CommentListItem> _commentLists;
 
         public CommentPageViewModel()
         {
             var content = Ioc.Default.GetRequiredService<LocalDbContext>();
-            Users = content.GetHistoryImUsers();
+            Users = content.GetHistoryUsers();
             InitializeCommentLists();
         }
 
-        partial void OnUsersChanged(ObservableCollection<IMUser> value)
+        partial void OnUsersChanged(ObservableCollection<LocalUser> value)
         {
             InitializeCommentLists();
         }
@@ -34,25 +32,26 @@ namespace IMWinUi.ViewModels
 
         private void InitializeCommentLists()
         {
-            CommentLists.Clear();
-
-            var loginUser = Properties.Settings.Default.LastUserName ?? string.Empty;
-            if (string.IsNullOrEmpty(loginUser))
+            if (CommentLists == null)
             {
-                Debug.Write("用户或用户名为空");
-                return;
+                CommentLists = new ObservableCollection<CommentListItem>();
             }
+            else
+            {
+                CommentLists.Clear();
+            }
+            var loginUserId = Properties.Settings.Default.LastUserId;
 
             var content = Ioc.Default.GetRequiredService<LocalDbContext>();
-            var message = content.IMMessages;
+            var message = content.Messages;
             foreach (var user in Users)
             {
                 var latestMessage = message
                     .Find(m =>
-                        (m.SenderName == loginUser && m.ReceiverName == user.UserName) ||
-                        (m.SenderName == user.UserName && m.ReceiverName == loginUser)
+                        (m.SenderId == loginUserId && m.ReceiverId == user.UserId) ||
+                        (m.SenderId == user.UserId && m.ReceiverId == loginUserId)
                     )
-                    .OrderByDescending(msg => msg.SentAt)
+                    .OrderByDescending(msg => msg.SendTime)
                     .FirstOrDefault();
 
                 if (latestMessage != null)

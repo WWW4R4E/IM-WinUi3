@@ -9,6 +9,7 @@ namespace IMWinUi.Services
     {
         private Frame _contentFrame;
         private NavigationView _navigationView;
+        private bool _isSettingSelectedItem;
 
         // 注册 Frame 和 NavigationView
         public NavigationService(Frame contentFrame, NavigationView navigationView)
@@ -16,22 +17,35 @@ namespace IMWinUi.Services
             _contentFrame = contentFrame;
             _navigationView = navigationView;
         }
+
         // 导航到指定页面
-        public void NavigateTo(string pageTag, object? data)
+        public void NavigateTo(string pageTag, object? data, bool isNavigate = false)
         {
             var selectedItem = _navigationView.MenuItems
                 .OfType<NavigationViewItem>()
                 .FirstOrDefault(item => item.Tag?.ToString() == pageTag);
 
-            // 导航到对应页面
             Type? pageType = Type.GetType($"IMWinUi.Views.{pageTag}");
             if (pageType == null)
             {
                 throw new InvalidOperationException($"无法找到页面类型: IMWinUi.Views.{pageTag}");
             }
-            _navigationView.SelectedItem = selectedItem;
-            _contentFrame.Navigate(pageType, data);
-        }
 
+            // 如果是内部设置选中项触发的，则跳过导航
+            if (_isSettingSelectedItem)
+            {
+                return;
+            }
+
+            // 直接调用时（isNavigate为true）先执行导航
+            _contentFrame.Navigate(pageType, data);
+
+            if (isNavigate)
+            {
+                _isSettingSelectedItem = true;
+                _navigationView.SelectedItem = selectedItem;
+                _isSettingSelectedItem = false;
+            }
+        }
     }
 }

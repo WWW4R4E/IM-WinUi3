@@ -19,10 +19,8 @@ namespace IMWinUi.ViewModels
             _commentBadgeCount = GetNewMessageCount();
             _contactBadgeCount = 0;
             _favoriteBadgeCount = 0;
-
-
-            var chatClientViewModel = Ioc.Default.GetService<ChatClientService>();
-            chatClientViewModel.MessageSent += (sender, e) =>
+            
+            Ioc.Default.GetService<ChatClientService>()!.MessageSent += (sender, e) =>
             {
                 CommentBadgeCount = GetNewMessageCount();
             };
@@ -30,9 +28,7 @@ namespace IMWinUi.ViewModels
 
         private int GetNewMessageCount()
         {
-            var content = Ioc.Default.GetRequiredService<LocalDbContext>();
-            var newMessageCount = content.GetNewMessageCount(Properties.Settings.Default.LastUserName);
-            return newMessageCount;
+            return  Ioc.Default.GetRequiredService<LocalDbContext>().GetNewMessageCount();
         }
     }
 }

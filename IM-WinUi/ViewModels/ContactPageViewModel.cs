@@ -9,18 +9,18 @@ namespace IMWinUi.ViewModels
     internal partial class ContactPageViewModel : ObservableObject 
     {
         [ObservableProperty] 
-        private IMUser? _user; 
+        private LocalUser? _user; 
         [ObservableProperty] 
-        private ObservableCollection<IMUser> _friends; 
+        private ObservableCollection<LocalUser> _friends; 
         
         internal static ObservableCollection<GroupInfoList> GetContactsGroupedAsync()
         {
-            var content = Ioc.Default.GetRequiredService<LocalDbContext>(); 
+            var content = Ioc.Default.GetRequiredService<LocalDbContext>();
+
+            var friendUsers = content.GetUsers();
             
-            var contacts = content.GetImUsers();
-            
-            var query = from item in contacts
-                        group item by item.UserName.Substring(0, 1).ToUpper() 
+            var query = from item in friendUsers
+                        group item by item.Username.Substring(0, 1).ToUpper() 
                         into g
                         orderby g.Key 
                         select new GroupInfoList(g) { Key = g.Key };

@@ -28,17 +28,20 @@ public sealed partial class LoginWindow : Window
         InitializeComponent();
         if (_rememberLogin)
         {
-            UserNameTextBox.Text = Settings.Default.LastUserName;
-            PasswordBoxWithRevealMode.Password = Settings.Default.LastUserPassword;
+            if (Settings.Default.LastUserId != 0)
+            {
+                UserNameTextBox.Text = Settings.Default.LastUserId.ToString();
+                PasswordBoxWithRevealMode.Password = Settings.Default.LastUserPassword;
+            }
         }
     }
-    
+
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(UserNameTextBox.Text) &
             string.IsNullOrWhiteSpace(PasswordBoxWithRevealMode.Password))
         {
-            ShowDiaglog.ShowMessage("提示", "用户名和密码不能为空", this.Content.XamlRoot);
+            ShowDiaglog.ShowMessage("提示", "账号和密码不能为空", this.Content.XamlRoot);
         }
         else
         {
@@ -51,8 +54,19 @@ public sealed partial class LoginWindow : Window
 
                 if (_rememberLogin)
                 {
+                    // 初始化对应数据库
+                    db.InitializeDatabase(UserNameTextBox.Text);
+
                     // 保存登录用户名到设置
-                    Settings.Default.LastUserName = UserNameTextBox.Text;
+                    if (long.TryParse(UserNameTextBox.Text, out var userId))
+                    {
+                        Settings.Default.LastUserId = userId;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("用户名不是有效的整数", nameof(UserNameTextBox.Text));
+                    }
+
                     Settings.Default.LastUserPassword = PasswordBoxWithRevealMode.Password;
                     Settings.Default.Remember = true;
                     // 保存JWT令牌到设置
@@ -69,15 +83,10 @@ public sealed partial class LoginWindow : Window
                 // 同步数据库
                 await SyncDatabase();
 
-                if (db.IMUsers.Count() == 0)
-                {
-                    db.AddUser(new IMUser(1, UserNameTextBox.Text));
-                }
-
-                // var currentApp = (App)Application.Current;
-                // currentApp.m_window = new MainWindow();
-                // currentApp.m_window.Activate();
-                // Close();
+                var currentApp = (App)Application.Current;
+                currentApp.m_window = new MainWindow();
+                currentApp.m_window.Activate();
+                Close();
             }
             else
             {
@@ -98,7 +107,13 @@ public sealed partial class LoginWindow : Window
 
     private async Task SyncDatabase()
     {
-        // 从服务器获取增量数据
+        // 初始化 LastSyncTime
+        if (Settings.Default.LastSyncTime == DateTime.MinValue)
+        {
+            Settings.Default.LastSyncTime = DateTime.UtcNow.AddDays(-30); // 默认设置为 30 天前
+            Settings.Default.Save();
+        }
+
         await _accountService.GetDatabaseUpdatesAsync(Settings.Default.LastSyncTime);
         // 更新最后同步时间
         Settings.Default.LastSyncTime = DateTime.UtcNow;

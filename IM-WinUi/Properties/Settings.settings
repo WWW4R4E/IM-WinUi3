@@ -2,13 +2,10 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="IMWinUi.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="LastUserName" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="LastUserId" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="LastUserPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="Rem" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Remember" Type="System.Boolean" Scope="User">

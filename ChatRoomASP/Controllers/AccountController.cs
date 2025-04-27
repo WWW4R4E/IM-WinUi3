@@ -27,15 +27,37 @@ namespace ChatRoomASP.Controllers
         {
             if (ModelState.IsValid)
             {
+                // 创建用户
                 var user = new IMUser
-                { UserName = model.Name, Email = model.Email, PasswordHash = Password.HashPassword(model.Password) };
+                {
+                    UserName = model.Name,
+                    Email = model.Email,
+                    PasswordHash = Password.HashPassword(model.Password),
+                    LastActiveTime = DateTimeOffset.Now,
+                    CreatedAt = DateTimeOffset.Now,
+                    UpdatedAt = DateTimeOffset.Now
+                };
                 _context.IMUsers.Add(user);
                 await _context.SaveChangesAsync();
+
+                // 创建与自己好友关系
+                var selfRelation = new UserRelation
+                {
+                    InitiatorUserId = user.UserId,
+                    TargetUserId = user.UserId,
+                    RelationTypeId = 1, // 假设1表示好友关系
+                    RemarkName = "自己",
+                    CreatedAt = DateTimeOffset.Now,
+                    UpdatedAt = DateTimeOffset.Now
+                };
+                _context.UserRelations.Add(selfRelation);
+                await _context.SaveChangesAsync();
+
                 // 手动实现登录逻辑（如设置 Cookie）
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email)
+                    new(ClaimTypes.Name, user.UserName),
+                    new(ClaimTypes.Email, user.Email)
                 };
                 var identity = new ClaimsIdentity(claims, "CookieAuth");
                 var principal = new ClaimsPrincipal(identity);
@@ -47,6 +69,7 @@ namespace ChatRoomASP.Controllers
 
             return View(model);
         }
+
 
         [HttpGet]
         public IActionResult Login()
@@ -103,8 +126,5 @@ namespace ChatRoomASP.Controllers
             _logger.LogInformation("用户已登录");
             return RedirectToAction("Index", "Home");
         }
-
-
-
     }
 }

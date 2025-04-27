@@ -33,7 +33,7 @@ public class SearchService
             try
             {
                 // 尝试将 result 反序列化为 List<IMUser> 对象
-                var users = JsonSerializer.Deserialize<List<IMUser>>(result);
+                var users = JsonSerializer.Deserialize<List<LocalUser>>(result);
                 OnSearchResultReceived?.Invoke(new SearchResult
                 {
                     Success = true,

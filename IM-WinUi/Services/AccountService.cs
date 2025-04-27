@@ -25,9 +25,11 @@ namespace IMWinUi.ViewModels
         {
             Debug.WriteLine("开始初始化Account HubConnection...");
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5287/AccountHub") // 修复 URL 路径
+                .WithUrl("http://localhost:5287/AccountHub") // 不传递 JWT 令牌
                 .Build();
 
+            _hubConnection.On<List<LocalUser>?, List<LocalMessage>?, List<LocalGroup>?>("HandleDatabaseUpdates",
+                HandleDatabaseUpdates);
 
             // 注册登录结果回调
             _hubConnection.On<bool, string, string>("LoginResult", (success, message, jwtToken) =>
@@ -38,6 +40,7 @@ namespace IMWinUi.ViewModels
                     {
                         JwtToken = jwtToken; // 存储JWT令牌
                         _loginTaskCompletionSource.SetResult(true);
+                        _ = ReconnectWithTokenAsync(jwtToken); // 登录成功后重新连接并传递 JWT 令牌
                     }
                     else
                     {
@@ -68,7 +71,36 @@ namespace IMWinUi.ViewModels
             }
         }
 
-        internal async Task<bool> LoginAsync(string userNameText, string passwordText)
+        private async Task ReconnectWithTokenAsync(string jwtToken)
+        {
+            if (_hubConnection != null)
+            {
+                await _hubConnection.DisposeAsync(); // 断开当前连接
+            }
+
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5287/AccountHub", options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(jwtToken); // 传递 JWT 令牌
+                })
+                .Build();
+
+            _hubConnection.On<List<LocalUser>?, List<LocalMessage>?, List<LocalGroup>?>("HandleDatabaseUpdates",
+                HandleDatabaseUpdates);
+
+            try
+            {
+                await _hubConnection.StartAsync();
+                Debug.WriteLine("使用 JWT 令牌重新连接成功。");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"使用 JWT 令牌重新连接失败: {ex.Message}");
+            }
+        }
+
+
+        internal async Task<bool> LoginAsync(string userIdText, string passwordText)
         {
             try
             {
@@ -79,7 +111,7 @@ namespace IMWinUi.ViewModels
                 }
 
                 _loginTaskCompletionSource = new TaskCompletionSource<bool>();
-                await _hubConnection.InvokeAsync("Login", userNameText, passwordText);
+                await _hubConnection.InvokeAsync("Login", userIdText, passwordText);
                 Debug.WriteLine("用户登录请求已发送。");
                 return await _loginTaskCompletionSource.Task;
             }
@@ -89,6 +121,7 @@ namespace IMWinUi.ViewModels
                 return false;
             }
         }
+
 
         // 重连方法
         internal async Task StartConnectionAsync()
@@ -121,13 +154,15 @@ namespace IMWinUi.ViewModels
         {
             await _hubConnection.InvokeAsync("GetDatabaseUpdates", defaultLastSyncTime);
         }
-        
-        private async Task HandleDatabaseUpdates(List<IMMessage> update1 , List<IMUser> update2)
+
+        private async Task HandleDatabaseUpdates(List<LocalUser>? updateUsers, List<LocalMessage>? updateMessages,
+            List<LocalGroup>? updateGroups)
         {
             try
             {
-                db.UpdateImMessages(update1);
-                db.UpdateImUsers(update2);
+                db.SyncUsers(updateUsers);
+                db.SyncMessages(updateMessages);
+                db.SyncGroups(updateGroups);
                 OnUpdateDb?.Invoke(this, new UpdateDbEventArgs { Success = true });
             }
             catch
@@ -137,7 +172,7 @@ namespace IMWinUi.ViewModels
         }
     }
 
-    internal class UpdateDbEventArgs:EventArgs
+    internal class UpdateDbEventArgs : EventArgs
     {
         public bool Success { get; set; }
     }

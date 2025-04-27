@@ -22,7 +22,6 @@ namespace IMWinUi
             Services.AddSingleton<ChatClientService>();
             Services.AddSingleton<AccountService>();
             Services.AddSingleton<SearchService>();
-            // 配置 Ioc.Default
             Ioc.Default.ConfigureServices(Services.BuildServiceProvider());
 
             InitializeComponent();

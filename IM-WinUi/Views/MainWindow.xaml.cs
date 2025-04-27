@@ -1,13 +1,7 @@
-﻿using CommunityToolkit.Mvvm.DependencyInjection;
-using IMWinUi.Properties;
- using IMWinUi.Services;
+﻿using IMWinUi.Services;
  using IMWinUi.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
  using Microsoft.UI.Xaml.Controls;
- using Microsoft.UI.Xaml.Controls.Primitives;
-using System;
-using System.Diagnostics;
 
  namespace IMWinUi.Views;
 

@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using IMWinUi.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -82,7 +83,7 @@ namespace IMWinUi.Services
 
         private void ReceiveMessage(string messageJson)
         {
-            var message = JsonSerializer.Deserialize<IMMessage>(messageJson);
+            var message = JsonSerializer.Deserialize<LocalMessage>(messageJson);
 
             if (message == null)
             {
@@ -91,7 +92,7 @@ namespace IMWinUi.Services
             }
 
             var content = Ioc.Default.GetRequiredService<LocalDbContext>();
-            content.CreateMessage(message);
+            content.AddMessages(new List<LocalMessage>{message});
 
             Debug.WriteLine("消息已保存到数据库。");
             OnMessageReceive(new MessageReceiveEventArgs { Success = true });
@@ -108,7 +109,7 @@ namespace IMWinUi.Services
             Debug.WriteLine("发送失败了");
             return Task.CompletedTask;
         }
-        public async Task<bool> SendMessageAsync(IMMessage message)
+        public async Task<bool> SendMessageAsync(LocalMessage message)
         {
             if (_hubConnection.State != HubConnectionState.Connected)
             {
@@ -118,7 +119,8 @@ namespace IMWinUi.Services
 
             try
             {
-                await _hubConnection.InvokeAsync("SendMessage", message);
+                var messageJson = JsonSerializer.Serialize(message);
+                await _hubConnection.InvokeAsync("SendPrivateMessage", messageJson);
                 return true;
             }
             catch (Exception ex)

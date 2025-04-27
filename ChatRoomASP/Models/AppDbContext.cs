@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     // 用户相关
     public DbSet<IMUser> IMUsers { get; set; }
     public DbSet<RelationType> RelationTypes { get; set; }
+    public DbSet<UserRelation> UserRelations { get; set; } // 添加 UserRelations 的 DbSet
 
     // 消息相关
     public DbSet<IMMessage> IMMessages { get; set; }
@@ -19,10 +20,27 @@ public class AppDbContext : DbContext
     public DbSet<IMGroup> IMGroups { get; set; }
     public DbSet<IMGroupMember> IMGroupMembers { get; set; }
 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+        // 配置 IMUser 表的ID从 10000000 开始
+        modelBuilder.Entity<IMUser>().HasData(
+            new IMUser
+            {
+                UserId = 10000000, 
+                UserName = "InitialUser",
+                Email = "initial@example.com",
+                PasswordHash = "hashedpassword",
+                Status = 0,
+                LastActiveTime = new DateTime(2025, 1, 1), // 静态值
+                CreatedAt = new DateTime(2025, 1, 1),     // 静态值
+                UpdatedAt = new DateTime(2025, 1, 1)      // 静态值
+            }
+        );
+        
+        
         // 配置消息表的索引
         modelBuilder.Entity<IMMessage>()
             .HasIndex(m => new { m.ReceiverId, m.SentAt });

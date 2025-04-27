@@ -4,28 +4,33 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="using:IMWinUi.Models" 
-    xmlns:local="using:IMWinUi.Views" 
+    xmlns:model="using:IMWinUi.Models"
+    xmlns:local="using:IMWinUi.Views"
     xmlns:converter="using:IMWinUi.Converter"
     NavigationCacheMode="Enabled"
-    mc:Ignorable="d"    >
+    mc:Ignorable="d">
     <Page.Resources>
-        <converter:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
+        <converter:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter" />
+        <converter:UserIdToUsernameConverter x:Key="UserIdToUsernameConverter" />
         <!-- 定义四种 DataTemplate -->
         <!-- 自己发送的文本消息 -->
-        <DataTemplate x:Key="MyTextMessageTemplate" x:DataType="model:IMMessage">
+        <DataTemplate x:Key="MyTextMessageTemplate" x:DataType="model:LocalMessage">
             <StackPanel>
-                <TextBlock Text="{x:Bind SenderName}" HorizontalAlignment="Right"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Background="#2491ff" Margin="10" CornerRadius="4">
+                <TextBlock
+                    Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}"
+                    HorizontalAlignment="Right" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Background="#2491ff" Margin="10"
+                            CornerRadius="4">
                     <TextBlock Text="{x:Bind Content}" Padding="5" />
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
 
         <!-- 自己发送的图片消息 -->
-        <DataTemplate x:Key="MyImageMessageTemplate" x:DataType="model:IMMessage">
-            <StackPanel >
-                <TextBlock Text="{x:Bind SenderName}" HorizontalAlignment="Right"/>
+        <DataTemplate x:Key="MyImageMessageTemplate" x:DataType="model:LocalMessage">
+            <StackPanel>
+                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}" HorizontalAlignment="Right" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
                     <Image Source="{x:Bind Content}" Width="100" Height="100" />
                 </StackPanel>
@@ -33,19 +38,21 @@
         </DataTemplate>
 
         <!-- 对方发送的文本消息 -->
-        <DataTemplate x:Key="OtherTextMessageTemplate" x:DataType="model:IMMessage">
+        <DataTemplate x:Key="OtherTextMessageTemplate" x:DataType="model:LocalMessage">
             <StackPanel>
-                <TextBlock Text="{x:Bind SenderName}" HorizontalAlignment="Left"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="{ThemeResource SystemControlBackgroundBaseLowBrush}" Margin="10" CornerRadius="4">
+                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}" HorizontalAlignment="Left" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
+                            Background="{ThemeResource SystemControlBackgroundBaseLowBrush}" Margin="10"
+                            CornerRadius="4">
                     <TextBlock Text="{x:Bind Content}" Padding="5" />
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
 
         <!-- 对方发送的图片消息 -->
-        <DataTemplate x:Key="OtherImageMessageTemplate" x:DataType="model:IMMessage">
+        <DataTemplate x:Key="OtherImageMessageTemplate" x:DataType="model:LocalMessage">
             <StackPanel>
-                <TextBlock Text="{x:Bind SenderName}" HorizontalAlignment="Left"/>
+                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}" HorizontalAlignment="Left" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
                     <Image Source="{x:Bind Content}" Width="100" Height="100" />
                 </StackPanel>
@@ -62,88 +69,93 @@
         <DataTemplate x:Key="ContactListViewTemplate" x:DataType="model:CommentListItem">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Ellipse x:Name="Ellipse"
-                    Grid.RowSpan="2"
-                    Width ="32"
-                    Height="32"
-                    Margin="6"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
+                         Grid.RowSpan="2"
+                         Width="32"
+                         Height="32"
+                         Margin="6"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Center">
                     <Ellipse.Fill>
-                        <ImageBrush ImageSource="{x:Bind user.ProfilePicture, Converter={StaticResource ByteArrayToImageConverter}}"/>
+                        <ImageBrush
+                            ImageSource="{x:Bind user.ProfilePicture, Converter={StaticResource ByteArrayToImageConverter}}" />
                     </Ellipse.Fill>
                 </Ellipse>
                 <TextBlock Grid.Column="1"
-                    Text="{x:Bind user.UserName}"
-                    x:Phase="1"
-                    Style="{ThemeResource BaseTextBlockStyle}"
-                    Margin="12,6,0,0"/>
-                <TextBlock  Grid.Column="1"
-                    Grid.Row="1"
-                    Text="{x:Bind Message.Content}"
-                    x:Phase="2"
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Margin="12,0,0,6"/>
+                           Text="{x:Bind user.Username}"
+                           x:Phase="1"
+                           Style="{ThemeResource BaseTextBlockStyle}"
+                           Margin="12,6,0,0" />
+                <TextBlock Grid.Column="1"
+                           Grid.Row="1"
+                           Text="{x:Bind Message.Content}"
+                           x:Phase="2"
+                           Style="{ThemeResource BodyTextBlockStyle}"
+                           Margin="12,0,0,6" />
             </Grid>
         </DataTemplate>
     </Page.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <!-- 左侧联系人栏 -->
         <Grid Grid.Column="0">
-            <ListView Background="Transparent" ItemTemplate="{StaticResource ContactListViewTemplate}" x:Name="UserListBox" ItemsSource="{x:Bind CommentPageViewModel.CommentLists, Mode=TwoWay}" SelectionChanged="ListView_SelectChanged"/>
-            </Grid>
-        <Border Width="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Grid.Column="1"/>
+            <ListView Background="Transparent" ItemTemplate="{StaticResource ContactListViewTemplate}"
+                      x:Name="UserListBox" ItemsSource="{x:Bind CommentPageViewModel.CommentLists, Mode=TwoWay}"
+                      SelectionChanged="ListView_SelectChanged" />
+        </Grid>
+        <Border Width="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Grid.Column="1" />
 
         <!-- 右侧聊天记录 -->
         <Grid Grid.Column="2" Margin="5">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <ListView
                 ItemTemplateSelector="{StaticResource ChatMessageTemplateSelector}"
-                  ItemsSource="{x:Bind  CommentPageViewModel.Messages, Mode=OneWay}"
-                      SelectionMode="None">
+                ItemsSource="{x:Bind  CommentPageViewModel.Messages, Mode=OneWay}"
+                SelectionMode="None">
                 <ListView.ItemsPanel>
-                    <ItemsPanelTemplate >
-                        <ItemsStackPanel Orientation="Vertical" 
-                      ItemsUpdatingScrollMode="KeepLastItemInView"/>
+                    <ItemsPanelTemplate>
+                        <ItemsStackPanel Orientation="Vertical"
+                                         ItemsUpdatingScrollMode="KeepLastItemInView" />
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
             </ListView>
 
-            <Grid Grid.Row="1" Padding="0,0,0,0" >
+            <Grid Grid.Row="1" Padding="0,0,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBox x:Name="ChatInput" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" FontSize="21" Margin="0,0,10,0" Text="{x:Bind CommentPageViewModel.ChatInput, Mode=TwoWay}"/>
-                <Button Grid.Column="1" Content="📩" Click="sendTextButton_Click" CornerRadius="5" FontSize="21" Margin="0,0,10,0"/>
+                <TextBox x:Name="ChatInput" Grid.Column="0" TextWrapping="Wrap" AcceptsReturn="True" FontSize="21"
+                         Margin="0,0,10,0" Text="{x:Bind CommentPageViewModel.ChatInput, Mode=TwoWay}" />
+                <Button Grid.Column="1" Content="📩" Click="sendTextButton_Click" CornerRadius="5" FontSize="21"
+                        Margin="0,0,10,0" />
                 <Button Grid.Column="2" Content="😄" CornerRadius="5" FontSize="21" Margin="0,0,10,0">
                     <Button.Flyout>
                         <Flyout>
-                            <WebView2 x:Name="EmojiWebView" Width="310" Height="300"/>
+                            <WebView2 x:Name="EmojiWebView" Width="310" Height="300" />
                         </Flyout>
                     </Button.Flyout>
                 </Button>
-                <Button Grid.Column="3" Content="📂" Click="ImageButton_Click" CornerRadius="5" FontSize="21"/>
+                <Button Grid.Column="3" Content="📂" Click="ImageButton_Click" CornerRadius="5" FontSize="21" />
             </Grid>
         </Grid>
     </Grid>

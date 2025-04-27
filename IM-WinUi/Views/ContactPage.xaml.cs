@@ -5,36 +5,38 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Shapes;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace IMWinUi.Views
 {
     public sealed partial class ContactPage
     {
-        internal ContactPageViewModel ContactPageViewModel;
+        internal ContactPageViewModel ContactPageViewModel = new();
+
         public ContactPage()
         {
             InitializeComponent();
             ContactsCvs.Source = ContactPageViewModel.GetContactsGroupedAsync();
         }
-        
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
             var data = e.Parameter;
-            if (data != null && data is IMUser user)
+            if (data != null && data is LocalUser user)
             {
-                if (ContactPageViewModel.Friends.All(x => x.UserName != user.UserName))
+                if (ContactPageViewModel.Friends.All(x => x.UserId != user.UserId))
                 {
                     ContactPageViewModel.Friends.Add(user);
                 }
 
                 ContactPageViewModel.User =
-                    ContactPageViewModel.Friends.FirstOrDefault(x => x.UserName == user.UserName);
+                    ContactPageViewModel.Friends.FirstOrDefault(x => x.UserId == user.UserId);
             }
         }
-        
+
         private void LineElement_Loaded(object sender, RoutedEventArgs e)
         {
             var line = sender as Line;
@@ -76,14 +78,13 @@ namespace IMWinUi.Views
             var currentApp = (App)Application.Current;
             var window = (MainWindow)currentApp.m_window!;
             var navigationService = window.NavigationService;
-            navigationService.NavigateTo("CommentPage", ContactPageViewModel.User);
+            navigationService.NavigateTo("CommentPage", ContactPageViewModel.User, true);
         }
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListView listView = (sender as ListView)!;
-            ContactPageViewModel.User = (listView.SelectedItem as IMUser)!;
+            ContactPageViewModel.User = (listView.SelectedItem as LocalUser);
         }
     }
-
 }

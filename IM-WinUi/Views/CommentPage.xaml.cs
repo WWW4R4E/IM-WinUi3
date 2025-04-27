@@ -4,8 +4,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Web.WebView2.Core;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
@@ -32,20 +34,25 @@ namespace IMWinUi.Views
             base.OnNavigatedTo(e);
 
             var data = e.Parameter;
-            if (data != null && data is IMUser user)
+            if (data != null && data is LocalUser user)
             {
-                if (CommentPageViewModel.Users.All(x => x.UserName != user.UserName))
+                Debug.Write(JsonSerializer.Serialize(CommentPageViewModel.Users));
+                if (CommentPageViewModel.CommentLists.All(x => x.user.UserId != user.UserId))
+                {
+                    CommentPageViewModel.CommentLists.Add(new CommentListItem { user = user, Message = null });
+                }
+                if (CommentPageViewModel.Users.All(x => x.Username != user.Username))
                 {
                     CommentPageViewModel.Users.Add(user);
                 }
                 else
                 {
-                    Console.WriteLine("用户已存在：" + user.UserName);
+                    Console.WriteLine("用户已存在：" + user.Username);
                 }
 
                 UserListBox.SelectedIndex =
                     CommentPageViewModel.Users.IndexOf(
-                        CommentPageViewModel.Users.FirstOrDefault(x => x.UserName == user.UserName));
+                        CommentPageViewModel.Users.FirstOrDefault(x => x.Username == user.Username));
             }
         }
 
@@ -66,8 +73,7 @@ namespace IMWinUi.Views
 
         private async void sendTextButton_Click(object sender, RoutedEventArgs e)
         {
-            var iMMessage = new IMMessage(MessageType.Text, Properties.Settings.Default.LastUserName,
-                CommentPageViewModel.SelectUser.UserName, ChatInput.Text);
+            var iMMessage = LocalMessage.CreateMessage(CommentPageViewModel.SelectUser.UserId ,ChatInput.Text);
             try
             {
                 Debug.WriteLine("正在尝试发送消息");
@@ -87,7 +93,7 @@ namespace IMWinUi.Views
             {
                 DispatcherQueue.TryEnqueue(() =>
                 {
-                    GetNewChatMessages(CommentPageViewModel.SelectUser.UserName);
+                    GetNewChatMessages(CommentPageViewModel.SelectUser);
                     ChatInput.Text = string.Empty;
                 });
             }
@@ -122,23 +128,26 @@ namespace IMWinUi.Views
             }
         }
 
-        private void RefreshChatMessages(string user)
+        private void RefreshChatMessages(LocalUser user)
         {
             var content = Ioc.Default.GetRequiredService<LocalDbContext>();
-            var newMessages = content.GetIMMessages(Properties.Settings.Default.LastUserName, user);
+            var newMessages = content.GetMessages(Properties.Settings.Default.LastUserId);
 
             // 标记消息为已读
-            content.MarkMessagesAsRead(newMessages);
+            foreach (var VARIABLE in newMessages)
+            {
+                content.MarkMessageAsRead(VARIABLE.MessageId);
+            }
 
             // 更新 ViewModel 中的消息列表
-            CommentPageViewModel.Messages = newMessages;
+            CommentPageViewModel.Messages =  new ObservableCollection<LocalMessage>(newMessages);
         }
 
 
-        private void GetNewChatMessages(string user)
+        private void GetNewChatMessages(LocalUser user)
         {
             var content = Ioc.Default.GetRequiredService<LocalDbContext>();
-            var newMessage = content.GetLatestMessageBetweenUsers(Properties.Settings.Default.LastUserName, user);
+            var newMessage = content.GetLatestMessageBetweenUsers(Properties.Settings.Default.LastUserId, user.UserId);
             DispatcherQueue.TryEnqueue(() => { CommentPageViewModel.Messages.Add(newMessage); });
         }
 
@@ -147,7 +156,7 @@ namespace IMWinUi.Views
             if (sender is ListView listView && listView.SelectedItem is CommentListItem item)
             {
                 CommentPageViewModel.SelectUser = item.user;
-                RefreshChatMessages(CommentPageViewModel.SelectUser.UserName);
+                RefreshChatMessages(CommentPageViewModel.SelectUser);
             }
         }
     }

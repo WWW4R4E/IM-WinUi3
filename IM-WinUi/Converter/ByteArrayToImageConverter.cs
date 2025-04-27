@@ -1,32 +1,37 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Storage.Streams;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace IMWinUi.Converter;
 
-
 public class ByteArrayToImageConverter : IValueConverter
 {
+    // 静态加载本地占位图（需确保路径正确）
+    private static readonly BitmapImage PlaceholderImage = new BitmapImage(new Uri("ms-appx:///Assets/logo.jpg"));
+
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is byte[] bytes && bytes.Length > 0)
+        if (value is byte[] bytes && bytes.Length > 24)
         {
             var bitmap = new BitmapImage();
-            using (var stream = new InMemoryRandomAccessStream())
+            using (var stream = new Windows.Storage.Streams.InMemoryRandomAccessStream())
             {
-                // 将字节数组写入流
                 stream.WriteAsync(bytes.AsBuffer()).AsTask().GetAwaiter().GetResult();
                 stream.Seek(0);
-                // 设置图片源
                 bitmap.SetSource(stream);
             }
+
+            Debug.Write("转换成功");
             return bitmap;
         }
-        return null;
+
+        Debug.Write("转换失败");
+        return PlaceholderImage;
     }
 
+    // 反向转换接口
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
         throw new NotImplementedException();

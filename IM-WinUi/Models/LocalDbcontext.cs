@@ -7,218 +7,235 @@ using LiteDB;
 
 namespace IMWinUi.Models
 {
-    internal class LocalDbContext
+    public class LocalDbContext
     {
-        private readonly LiteDatabase _db;
-        public LiteCollection<IMUser> IMUsers { get; }
-        public LiteCollection<IMMessage> IMMessages { get; }
+        private string _loginId;
+        private LiteDatabase _database;
 
-        // 构造函数：初始化 LiteDB 数据库
+        #region 集合
+
+        public ILiteCollection<LocalUser> Users => _database.GetCollection<LocalUser>("users");
+        public ILiteCollection<LocalGroup> Groups => _database.GetCollection<LocalGroup>("groups");
+
+        public ILiteCollection<LocalGroupMember> GroupMembers =>
+            _database.GetCollection<LocalGroupMember>("groupmembers");
+
+        public ILiteCollection<LocalMessage> Messages => _database.GetCollection<LocalMessage>("messages");
+        public ILiteCollection<Notification> Notifications => _database.GetCollection<Notification>("notifications");
+
+        #endregion
+
+
         public LocalDbContext()
         {
-            // var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "localMIContext.db");
-            var dbPath = Path.Combine("C:\\Users\\123\\Desktop\\IM-WinUi3\\IM-WinUi", "localMIContext.db");
-            Console.WriteLine("dbPath:" + dbPath);
-            _db = new LiteDatabase(dbPath);
-
-            // 初始化集合
-            IMUsers = (LiteCollection<IMUser>?)_db.GetCollection<IMUser>("IMUsers");
-            IMMessages = (LiteCollection<IMMessage>?)_db.GetCollection<IMMessage>("IMMessages");
-
-            // 确保主键索引
-            IMUsers.EnsureIndex(x => x.UserName);
-            IMMessages.EnsureIndex(x => x.MessageId, true); // 主键唯一索引
         }
 
-        internal void CreateMessage(IMMessage iMMessage)
+        public void InitializeDatabase(string userId)
         {
-            iMMessage.MessageId = 0; // LiteDB 自动分配主键
-            IMMessages.Insert(iMMessage);
+            _loginId = userId;
+            // 根据用户 ID 创建对应的文件夹路径
+            string userFolderPath = Path.Combine("UserData", _loginId);
+            Directory.CreateDirectory(userFolderPath);
+
+            // 数据库文件路径
+            string dbFilePath = Path.Combine(userFolderPath, "user_data.db");
+
+            // 初始化 LiteDB 数据库
+            _database = new LiteDatabase(dbFilePath);
+        }
+
+        // 全量同步模板
+        public void Sync<T>(ILiteCollection<T> collection, List<T>? items) where T : class
+        {
+            try
+            {
+                // 开始事务
+                _database.BeginTrans();
+
+                // 执行操作
+                collection.DeleteAll();
+                if (items?.Any() ?? false)
+                    collection.InsertBulk(items);
+
+                // 提交事务
+                _database.Commit();
+            }
+            catch (Exception)
+            {
+                // 发生异常时回滚事务
+                _database.Rollback();
+                throw; // 重新抛出异常供调用方处理
+            }
         }
 
 
-        internal void MarkMessagesAsRead(IEnumerable<IMMessage> messages)
+        // 同步用户信息
+        public void SyncUsers(List<LocalUser>? users)
         {
-            // 将所有消息标记为已读
-            var updatedMessages = messages.Select(message =>
+            Sync(Users, users);
+        }
+        
+        // 同步群组信息
+        public void SyncMessages(List<LocalMessage> messages)
+        {
+            Sync(Messages, messages);
+        }
+
+        // 同步群组列表
+        public void SyncGroups(List<LocalGroup>? groups)
+        {
+            Sync(Groups, groups);
+        }
+
+        // 同步群组成员列表
+        public void SyncGroupMembers(long groupId, List<LocalGroupMember>? members)
+        {
+            Sync(GroupMembers, members);
+        }
+
+        // 添加消息到本地数据库
+        public void AddMessages(List<LocalMessage> messages)
+        {
+            foreach (var message in messages)
+            {
+                Messages.Insert(message);
+            }
+        }
+
+        // 添加通知到本地数据库
+        public void AddNotifications(List<Notification> notifications)
+        {
+            foreach (var notification in notifications)
+            {
+                Notifications.Insert(notification);
+            }
+        }
+
+        // 获取未读消息
+        public List<LocalMessage> GetUnreadMessages()
+        {
+            return Messages.Find(m => m.IsRead == false).ToList();
+        }
+
+        // 获取未读通知
+        public List<Notification> GetUnreadNotifications()
+        {
+            return Notifications.Find(n => n.IsRead == false).ToList();
+        }
+
+        // 标记消息为已读
+        public void MarkMessageAsRead(long messageId)
+        {
+            var message = Messages.FindById(messageId);
+            if (message != null)
             {
                 message.IsRead = true;
-                return message;
-            }).ToList();
-
-            // 批量更新
-            IMMessages.Update(updatedMessages);
+                Messages.Update(message);
+            }
         }
 
-
-        internal void AddUser(IMUser iMUser)
+        // 标记通知为已读
+        public void MarkNotificationAsRead(int notificationId)
         {
-            IMUsers.Insert(iMUser);
+            var notification = Notifications.FindById(notificationId);
+            if (notification != null)
+            {
+                notification.IsRead = true;
+                Notifications.Update(notification);
+            }
         }
 
-        internal ObservableCollection<IMMessage> GetIMMessages(string lastUserName, string selectUser)
+        // 获取联系人列表
+        public List<LocalUser> GetUsers()
         {
-            var messages = IMMessages
-                .Find(m => (m.SenderName == lastUserName && m.ReceiverName == selectUser) ||
-                           (m.SenderName == selectUser && m.ReceiverName == lastUserName))
-                .OrderBy(m => m.SentAt)
-                .ToList();
-            return new ObservableCollection<IMMessage>(messages);
+            return Users.FindAll().ToList();
         }
 
-        internal IMMessage GetLatestMessageBetweenUsers(string lastUserName, string selectUser)
+        // 获取群组列表
+        public List<LocalGroup> GetGroups()
         {
-            var latestMessage = IMMessages
-                .Find(m => (m.SenderName == lastUserName && m.ReceiverName == selectUser) ||
-                           (m.SenderName == selectUser && m.ReceiverName == lastUserName))
-                .OrderByDescending(m => m.SentAt)
+            return Groups.FindAll().ToList();
+        }
+
+        // 获取群组成员列表
+        public List<LocalGroupMember> GetGroupMembers(long groupId)
+        {
+            return GroupMembers.Find(m => m.GroupId == groupId).ToList();
+        }
+
+        // 获取消息列表
+        public List<LocalMessage> GetMessages(long? receiverId = null, long? groupId = null)
+        {
+            if (receiverId.HasValue)
+            {
+                return Messages.Find(m => m.ReceiverId == receiverId).ToList();
+            }
+            else if (groupId.HasValue)
+            {
+                return Messages.Find(m => m.GroupId == groupId).ToList();
+            }
+            else
+            {
+                return Messages.FindAll().ToList();
+            }
+        }
+
+        // 获取通知列表
+        public List<Notification> GetNotifications()
+        {
+            return Notifications.FindAll().ToList();
+        }
+
+        // 获取用户信息
+        public LocalUser GetUser(long userId)
+        {
+            return Users.FindOne(x => x.UserId == userId);
+        }
+
+        // 更新用户状态
+        public void UpdateUserStatus(long userId, int status)
+        {
+            var user = Users.FindOne(x => x.UserId == userId);
+            if (user != null)
+            {
+                user.Status = status;
+                Users.Update(user);
+            }
+        }
+        
+
+        public ObservableCollection<LocalUser> GetHistoryUsers()
+        {
+            var senderIds = Messages.FindAll().Select(m => m.SenderId);
+            var receiverIds = Messages.FindAll().Select(m => m.ReceiverId);
+            var userIds = senderIds.Union<long>(receiverIds).Distinct().ToList();
+
+            var users = Users.Find(u => userIds.Contains(u.UserId)).ToList();
+            
+            return new ObservableCollection<LocalUser>(users);
+        }
+        
+        
+        // 实现 IDisposable 接口，确保正确释放资源
+        public void Dispose()
+        {
+            _database.Dispose();
+        }
+
+        public int GetNewMessageCount()
+        {
+            long defaultLastUserId = Properties.Settings.Default.LastUserId;
+            return Messages.Count(m => (m.SenderId == defaultLastUserId || m.ReceiverId == defaultLastUserId) && !m.IsRead);
+        }
+
+        public LocalMessage GetLatestMessageBetweenUsers(long defaultLastUserId, long userId)
+        {
+            var latestMessage = Messages
+                .Find(m => (m.SenderId == defaultLastUserId && m.ReceiverId == userId) ||
+                           (m.SenderId == userId && m.ReceiverId == defaultLastUserId))
+                .OrderByDescending(m => m.SendTime)
                 .FirstOrDefault();
             return latestMessage;
         }
-
-        internal ObservableCollection<IMUser> GetHistoryImUsers()
-        {
-            var senderNames = IMMessages.FindAll().Select(m => m.SenderName);
-            var receiverNames = IMMessages.FindAll().Select(m => m.ReceiverName);
-            var userNames = senderNames.Union(receiverNames).Distinct().ToList();
-
-            var users = IMUsers
-                .Find(user => userNames.Contains(user.UserName))
-                .ToList();
-
-            return new ObservableCollection<IMUser>(users);
-        }
-
-        internal List<IMUser> GetImUsers()
-        {
-            return IMUsers.FindAll().ToList();
-        }
-
-        internal int GetNewMessageCount(string lastUserName)
-        {
-            return IMMessages.Count(m => (m.SenderName == lastUserName || m.ReceiverName == lastUserName) && !m.IsRead);
-        }
-
-        public void UpdateImMessages(List<IMMessage> update1)
-        {
-            foreach (var message in update1)
-            {
-                IMMessages.Update(message);
-            }
-        }
-
-        public void UpdateImUsers(List<IMUser> update2)
-        {
-            foreach (var user in update2)
-            {
-                IMUsers.Update(user);
-            }
-        }
     }
 }
-
-// namespace IMWinUi.Models
-// {
-//     internal class LocalDbcontext : DbContext
-//     {
-//         public DbSet<IMUser> IMUsers { get; set; } // 本地用户表
-//         public DbSet<IMMessage> IMMessages { get; set; } // 本地消息表
-//         public DbSet<FavoriteItem> FavoriteItems { get; set; } //本地信息表
-//
-//         // 添加接受DbContextOptions的构造函数
-//         public LocalDbcontext(DbContextOptions<LocalDbcontext> options) : base(options)
-//         {
-//         }
-//
-//         internal void CreateMessage(IMMessage iMMessage)
-//         {
-//             iMMessage.MessageId = 0;
-//             IMMessages.Add(iMMessage);
-//             SaveChanges();
-//         }
-//
-//         internal void CreateUser(IMUser iMUser)
-//         {
-//             IMUsers.Add(iMUser);
-//             SaveChanges();
-//         }
-//
-//         internal ObservableCollection<IMMessage> GetIMMessages(string lastUserName, string selectUser)
-//         {
-//             // 查询两个用户之间的消息
-//             var messages = IMMessages
-//                 .Where(m => (m.SenderName == lastUserName && m.ReceiverName == selectUser) ||
-//                             (m.SenderName == selectUser && m.ReceiverName == lastUserName))
-//                 .OrderBy(m => m.SentAt)
-//                 .ToList();
-//             return new ObservableCollection<IMMessage>(messages);
-//         }
-//
-//         internal IMMessage GetLatestMessageBetweenUsers(string lastUserName, string selectUser)
-//         {
-//             // 查询两个用户之间的最新消息
-//             var latestMessage = IMMessages
-//                 .Where(m => (m.SenderName == lastUserName && m.ReceiverName == selectUser) ||
-//                             (m.SenderName == selectUser && m.ReceiverName == lastUserName))
-//                 .OrderByDescending(m => m.SentAt) // 按时间降序排列
-//                 .FirstOrDefault(); // 获取最新的一条消息
-//
-//             return latestMessage;
-//         }
-//
-//
-//         internal ObservableCollection<IMUser> GetHistoryImUsers()
-//         {
-//             // 1. 分别获取发送者和接收者的用户名，合并后去重
-//             var senderNames = IMMessages.Select(m => m.SenderName);
-//             var receiverNames = IMMessages.Select(m => m.ReceiverName);
-//             var userNames = senderNames.Union(receiverNames).Distinct().ToList();
-//
-//             // 2. 查询用户表
-//             var users = IMUsers
-//                 .Where(user => userNames.Contains(user.Username))
-//                 .ToList();
-//
-//             return new ObservableCollection<IMUser>(users);
-//         }
-//
-//         internal List<IMUser> GetIMUsers()
-//         {
-//             var users = IMUsers
-//                 .ToList();
-//             return users;
-//         }
-//
-//         internal int GetNewMessageCount(string lastUserName)
-//         {
-//             var result = IMMessages
-//                 .Count(m => (m.SenderName == lastUserName | m.ReceiverName == lastUserName) && m.IsRead == false);
-//             return result;
-//         }
-//
-//         internal ObservableCollection<FavoriteItem> GetFavoriteItems()
-//         {
-//             var favoriteItems = FavoriteItems.ToList();
-//             return new ObservableCollection<FavoriteItem>(favoriteItems);
-//         }
-//         
-//         internal bool AddFavoriteItems(string Text, List<string> ImageUrls)
-//         {
-//             try
-//             {
-//                 FavoriteItems.Add(new FavoriteItem
-//                     (Text, ImageUrls)
-//                     {
-//                         Text = Text,
-//                         ImageUrls = ImageUrls
-//                     });
-//             }
-//             catch (Exception ex)
-//             {
-//                 Debug.WriteLine(ex.Message);
-//             }
-//         
-//             return false;
-//         }
-//     }
-// }

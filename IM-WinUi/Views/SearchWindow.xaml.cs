@@ -8,9 +8,6 @@ using System;
 using System.Diagnostics;
 using Windows.Graphics;
 using WinRT.Interop;
-using System.Text.Json;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using IMWinUi.Services;
 
 namespace IMWinUi.Views
 {
@@ -60,14 +57,14 @@ namespace IMWinUi.Views
         private void ListViewBase_OnItemClick(object sender, ItemClickEventArgs e)
         {
             var clickedData = e.ClickedItem; 
-            if (clickedData is IMUser)
+            if (clickedData is LocalUser)
             {
                 var currentApp = (App)Application.Current;
                 var window = (MainWindow)currentApp.m_window!;
                 var navigationService = window.NavigationService;
-                navigationService.NavigateTo("ContactPage", clickedData as IMUser);
+                navigationService.NavigateTo("ContactPage", clickedData as LocalUser);
             }
-            else if(clickedData is IMMessage)
+            else if(clickedData is LocalMessage)
             {
                 Debug.WriteLine("IMMessage");
             }

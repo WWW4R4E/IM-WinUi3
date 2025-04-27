@@ -15,7 +15,7 @@
 
         <!-- 定义 DataTemplate -->
         <DataTemplate x:Key="ContactListViewTemplate"
-                      x:DataType="models:IMUser">
+                      x:DataType="models:LocalUser">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -34,12 +34,12 @@
                          HorizontalAlignment="Center">
                     <Ellipse.Fill>
                         <ImageBrush
-                            ImageSource="{x:Bind ProfilePicture, Converter={StaticResource ByteArrayToImageConverter}}" />
+                            ImageSource="{x:Bind ProfilePicture, Converter={StaticResource ByteArrayToImageConverter}}"/>
                     </Ellipse.Fill>
                 </Ellipse>
 
                 <TextBlock Grid.Row="0" Grid.Column="1"
-                           Text="{x:Bind UserName}"
+                           Text="{x:Bind Username}"
                            x:Phase="1"
                            Style="{ThemeResource BaseTextBlockStyle}"
                            Margin="12,6,0,0" />
@@ -147,8 +147,7 @@
         <Border Width="1"
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 Grid.Column="1" />
-        <Grid x:Name="UserInfromation"
-              Grid.Column="2">
+        <Grid Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -170,15 +169,14 @@
                 </Ellipse>
                 <StackPanel VerticalAlignment="Stretch"
                             Margin="20,8">
-                    <TextBlock Text="{x:Bind ContactPageViewModel.User.UserName, Mode=TwoWay}"
+                    <TextBlock Text="{x:Bind ContactPageViewModel.User.Username, Mode=TwoWay}"
                                Foreground="White"
                                FontSize="16" />
                 </StackPanel>
             </StackPanel>
 
             <!-- 简介和举报 -->
-            <StackPanel x:Name="Stake1"
-                        Grid.Row="1"
+            <StackPanel Grid.Row="1"
                         Margin="20">
                 <Line Stroke="AliceBlue"
                       X1="0"
