@@ -31,7 +31,9 @@ namespace IMWinUi
         {
 
             // 创建窗口实例后操作
-            m_window = new LoginWindow();
+            // m_window = new LoginWindow();
+            m_window = new AddWindow( );
+            m_window.Content = new AddPage(new byte[] {}, null);
             var windowAppWindow = m_window.AppWindow; 
 
             // 配置窗口属性

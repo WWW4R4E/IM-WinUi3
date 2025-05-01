@@ -6,46 +6,40 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:models="using:IMWinUi.Models"
     mc:Ignorable="d"
-    Title="Seaindow">
+    Title="SearchWindows">
 
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
     <Page>
         <Page.Resources>
-            <!-- 用户列表模板 -->
-            <DataTemplate x:Key="UserListViewTemplate" x:DataType="models:LocalUser">
+            <!-- 查询结果列表模板 -->
+            <DataTemplate x:Key="ResultListViewTemplate" x:DataType="models:ResultInformation">
                 <Grid Background="Transparent">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Ellipse x:Name="Ellipse"
-                             Grid.RowSpan="2"
-                             Width="32"
-                             Height="32"
-                             Margin="6"
+                             Width="38"
+                             Height="38"
                              VerticalAlignment="Center"
                              HorizontalAlignment="Center"
                              Fill="{ThemeResource SystemControlBackgroundBaseMediumBrush}" />
-                    <TextBlock Grid.Column="1"
-                               Text="{x:Bind Username}"
+                    <StackPanel Grid.Column="1">
+                    <TextBlock Text="{x:Bind Name}"
                                x:Phase="1"
                                Style="{ThemeResource BaseTextBlockStyle}"
                                Margin="12,6,0,0" />
-                    <TextBlock Grid.Column="1"
-                               Grid.Row="1"
-                               Text="{x:Bind   ProfilePicture}"
+                    <TextBlock Text="{x:Bind  Id}"
                                x:Phase="2"
                                Style="{ThemeResource BodyTextBlockStyle}"
                                Margin="12,0,0,6" />
+                    </StackPanel>
+                        <Button Content="添加" Grid.Column="2" Click="ButtonBase_OnClick"/>
                 </Grid>
             </DataTemplate>
-            <!-- 群组列表模板 -->
         </Page.Resources>
         <Grid>
             <Grid.RowDefinitions>
@@ -70,14 +64,12 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <!-- 搜索栏 -->
-                        <AutoSuggestBox
-                            Margin="10"
+                        <AutoSuggestBox Margin="0,10"
                             QuerySubmitted="SearchBox_OnQuerySubmitted" />
                         <ListView Grid.Row="1" SelectionMode="None"
                                   IsItemClickEnabled="True"
                                   ItemsSource="{x:Bind _searchViewModel.ResultUsers, Mode=OneWay}"
-                                  ItemTemplate="{StaticResource ContactListViewTemplate}"
-                                  ItemClick="ListViewBase_OnItemClick"
+                                  ItemTemplate="{StaticResource ResultListViewTemplate}"
                                   IsHoldingEnabled="False" />
                     </Grid>
                 </PivotItem>
@@ -87,15 +79,13 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <AutoSuggestBox
-                            Margin="10"
+                        <AutoSuggestBox Margin="0,10"
                             QuerySubmitted="SearchBox_OnQuerySubmitted" />
                         <ListView Grid.Row="1"
                                   SelectionMode="None"
                                   IsItemClickEnabled="True"
                                   ItemsSource="{x:Bind _searchViewModel.ResultMessages, Mode=OneWay}"
-                                  ItemTemplate="{StaticResource ContactListViewTemplate}"
-                                  ItemClick="ListViewBase_OnItemClick"
+                                  ItemTemplate="{StaticResource ResultListViewTemplate}"
                                   IsHoldingEnabled="False" />
                     </Grid>
                 </PivotItem>

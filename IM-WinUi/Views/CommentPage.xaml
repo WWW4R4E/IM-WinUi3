@@ -30,7 +30,8 @@
         <!-- 自己发送的图片消息 -->
         <DataTemplate x:Key="MyImageMessageTemplate" x:DataType="model:LocalMessage">
             <StackPanel>
-                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}" HorizontalAlignment="Right" />
+                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}"
+                           HorizontalAlignment="Right" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
                     <Image Source="{x:Bind Content}" Width="100" Height="100" />
                 </StackPanel>
@@ -40,7 +41,8 @@
         <!-- 对方发送的文本消息 -->
         <DataTemplate x:Key="OtherTextMessageTemplate" x:DataType="model:LocalMessage">
             <StackPanel>
-                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}" HorizontalAlignment="Left" />
+                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}"
+                           HorizontalAlignment="Left" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
                             Background="{ThemeResource SystemControlBackgroundBaseLowBrush}" Margin="10"
                             CornerRadius="4">
@@ -52,7 +54,8 @@
         <!-- 对方发送的图片消息 -->
         <DataTemplate x:Key="OtherImageMessageTemplate" x:DataType="model:LocalMessage">
             <StackPanel>
-                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}" HorizontalAlignment="Left" />
+                <TextBlock Text="{x:Bind SenderId, Converter={StaticResource UserIdToUsernameConverter}}"
+                           HorizontalAlignment="Left" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
                     <Image Source="{x:Bind Content}" Width="100" Height="100" />
                 </StackPanel>

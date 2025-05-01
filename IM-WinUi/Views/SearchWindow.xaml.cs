@@ -5,7 +5,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using Windows.Graphics;
 using WinRT.Interop;
 
@@ -51,24 +51,21 @@ namespace IMWinUi.Views
 
         private void SearchBox_OnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            _searchViewModel.ExecuteSearch(args.QueryText);
+            // _searchViewModel.ExecuteSearch(args.QueryText);
+            _searchViewModel.ResultUsers = new List<ResultInformation>
+            {
+                new ResultInformation
+                {
+                    Id = 1,
+                    Name = "test",
+                    ProfilePicture = new byte[0]
+                },
+            };
         }
 
-        private void ListViewBase_OnItemClick(object sender, ItemClickEventArgs e)
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            var clickedData = e.ClickedItem; 
-            if (clickedData is LocalUser)
-            {
-                var currentApp = (App)Application.Current;
-                var window = (MainWindow)currentApp.m_window!;
-                var navigationService = window.NavigationService;
-                navigationService.NavigateTo("ContactPage", clickedData as LocalUser);
-            }
-            else if(clickedData is LocalMessage)
-            {
-                Debug.WriteLine("IMMessage");
-            }
+            throw new NotImplementedException();
         }
-
     }
 }

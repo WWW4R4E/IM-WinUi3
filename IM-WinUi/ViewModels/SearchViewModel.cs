@@ -14,39 +14,41 @@ namespace IMWinUi.ViewModels
 {
     public partial class SearchViewModel : ObservableObject
     {
-        internal readonly SearchService _searchService;
-        [ObservableProperty] private List<LocalUser> _resultUsers;
-        [ObservableProperty] private List<LocalMessage> _resultMessages;
+        internal readonly SearchService SearchService;
+        [ObservableProperty] private List<ResultInformation>? _resultUsers;
+        [ObservableProperty] private List<LocalMessage>? _resultMessages;
         private readonly DispatcherQueue _dispatcherQueue;
 
         public SearchViewModel()
         {
-            _searchService = Ioc.Default.GetRequiredService<SearchService>();
-            _searchService.OnSearchResultReceived += HandleSearchResult;
+            SearchService = Ioc.Default.GetRequiredService<SearchService>();
+            SearchService.OnSearchResultReceived += HandleSearchResult;
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         }
 
         ~SearchViewModel()
         {
-            _searchService.OnSearchResultReceived -= HandleSearchResult;
+            SearchService.OnSearchResultReceived -= HandleSearchResult;
         }
 
         [RelayCommand]
-        internal async Task ExecuteSearch(string argsQueryText)
+        internal void ExecuteSearch(string argsQueryText)
         {
-            _searchService.SearchUser(argsQueryText);
+            SearchService.SearchUser(argsQueryText);
         }
 
         internal void HandleSearchResult(SearchResult result)
         {
-            Debug.WriteLine("搜索结果：" + result);
-            switch (result.Type)
-            {
-                case "IMUserList":
+            // 序列化输出result
+            
+            Debug.WriteLine("查询结果为:"+ JsonSerializer.Serialize(result.Result));
+            // switch (result.Type)
+            // {
+            //     case "IMUserList":
 
-                    _dispatcherQueue.TryEnqueue(() => { ResultUsers = result.Result as List<LocalUser>; });
-                    break;
-            }
+                    _dispatcherQueue.TryEnqueue(() => { ResultUsers = result.Result; });
+                    // break;
+            // }
         }
     }
 }

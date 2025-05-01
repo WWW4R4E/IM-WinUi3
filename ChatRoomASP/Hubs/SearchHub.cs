@@ -44,14 +44,13 @@ public class SearchHub : Hub
     if (combinedResults.Any())
     {
       var resultJson = JsonSerializer.Serialize(combinedResults);
-      await Clients.Caller.SendAsync("SearchResult", resultJson);
-      _logger.LogInformation("搜索用户: {SearchTerm}", searchTerm);
+      _logger.LogInformation("搜索到的数据为: {resultJson}", resultJson);
+      await Clients.Caller.SendAsync("SearchUserResult", resultJson);
     }
     else
     {
-      await Clients.Caller.SendAsync("SearchResult", "用户未找到。");
+      await Clients.Caller.SendAsync("SearchUserResult", "用户未找到。");
       _logger.LogInformation("搜索用户: {SearchTerm}", "用户未找到。");
     }
-    _logger.LogInformation("搜索用户: {SearchTerm}", searchTerm);
   }
 }

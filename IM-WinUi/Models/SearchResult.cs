@@ -1,8 +1,10 @@
-﻿namespace IMWinUi.Models;
+﻿using System.Collections.Generic;
+
+namespace IMWinUi.Models;
 
 public class SearchResult
 {
     public bool Success { get; set; }
     public string Type { get; set; }
-    public object Result { get; set; }
+    public List<ResultInformation>? Result { get; set; }
 }

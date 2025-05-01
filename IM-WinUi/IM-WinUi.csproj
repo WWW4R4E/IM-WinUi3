@@ -17,6 +17,8 @@
     <ItemGroup>
       <None Remove="Controls\SettingExpander.xaml" />
       <None Remove="Controls\SettingToggleSwitch.xaml" />
+      <None Remove="Views\BlankPage1.xaml" />
+      <None Remove="Views\BlankWindow1.xaml" />
       <None Remove="Views\SearchWindow.xaml" />
       <None Remove="Views\SettingPage.xaml" />
     </ItemGroup>
@@ -56,6 +58,9 @@
         <Page Update="Views\FavoritePage.xaml">
             <Generator>MSBuild:Compile</Generator>
         </Page>
+        <Page Update="Views\AddPage.xaml">
+          <SubType>Designer</SubType>
+        </Page>
     </ItemGroup>
     <ItemGroup>
         <Page Update="Views\ContactPage.xaml">
@@ -93,6 +98,12 @@
             <Generator>SettingsSingleFileGenerator</Generator>
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
         </None>
+        <Page Update="Views\BlankWindow1.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Views\BlankPage1.xaml">
+          <Generator>MSBuild:Compile</Generator>
+        </Page>
         <Page Update="Views\SettingPage.xaml">
           <Generator>MSBuild:Compile</Generator>
         </Page>

@@ -26,43 +26,46 @@ public class SearchService
         _hubConnection = new HubConnectionBuilder()
             .WithUrl("http://localhost:5287/Searchhub")
             .Build();
+        
+        // 注册不同类型的搜索结果处理
+        RegisterSearchHandler("SearchUserResult", "UserList");
+        RegisterSearchHandler("SearchGroupResult", "GroupList");
+        
+        // 启动连接
+        await _hubConnection.StartAsync();
+    }
 
-        // 将On方法的参数类型改为object以接收不同类型结果
-        _hubConnection.On<string>("SearchResult", result =>
+    private void RegisterSearchHandler(string eventName, string resultType)
+    {
+        _hubConnection.On<string>(eventName, result =>
         {
             try
             {
-                // 尝试将 result 反序列化为 List<IMUser> 对象
-                var users = JsonSerializer.Deserialize<List<LocalUser>>(result);
+                Debug.WriteLine($"[{eventName}] 接收到搜索结果：" + result);
+                var users = JsonSerializer.Deserialize<List<ResultInformation>>(result);
                 OnSearchResultReceived?.Invoke(new SearchResult
                 {
                     Success = true,
-                    Type = "IMUserList",
+                    Type = resultType,
                     Result = users
                 });
             }
             catch (JsonException)
             {
-                // 反序列化失败，说明 result 是错误消息
                 OnSearchResultReceived?.Invoke(new SearchResult
                 {
                     Success = false,
-                    Type = "Error",
-                    Result = result
+                    Type = "Error"
                 });
             }
         });
-
-        // 启动连接
-        await _hubConnection.StartAsync();
     }
-
     // 搜索用户
-    public async Task SearchUser(string searchTerm)
+    public void SearchUser(string searchTerm)
     {
         if (_hubConnection.State == HubConnectionState.Connected)
         {
-            await _hubConnection.SendAsync("SearchUser", searchTerm);
+             _hubConnection.SendAsync("SearchUser", searchTerm);
             Debug.WriteLine("发送搜索请求：" + searchTerm);
         }
         else
