@@ -26,6 +26,7 @@ public sealed partial class LoginWindow : Window
         _accountService = Ioc.Default.GetRequiredService<AccountService>();
         _accountService.OnUpdateDb += ToCommentPage;
         InitializeComponent();
+        WinHelper.SetWindowSizeAndCenter(this, 680, 880);
         if (_rememberLogin)
         {
             if (Settings.Default.LastUserId != 0)
@@ -41,7 +42,7 @@ public sealed partial class LoginWindow : Window
         if (string.IsNullOrWhiteSpace(UserNameTextBox.Text) &
             string.IsNullOrWhiteSpace(PasswordBoxWithRevealMode.Password))
         {
-            ShowDiaglog.ShowMessage("提示", "账号和密码不能为空", this.Content.XamlRoot);
+            WinHelper.ShowMessage("提示", "账号和密码不能为空", this.Content.XamlRoot);
         }
         else
         {
@@ -90,7 +91,7 @@ public sealed partial class LoginWindow : Window
             }
             else
             {
-                ShowDiaglog.ShowMessage("提示", "登录失败，请检查用户名和密码或与服务器的网络连接。", this.Content.XamlRoot);
+                WinHelper.ShowMessage("提示", "登录失败，请检查用户名和密码或与服务器的网络连接。", this.Content.XamlRoot);
                 _accountService.StartConnectionAsync();
             }
         }

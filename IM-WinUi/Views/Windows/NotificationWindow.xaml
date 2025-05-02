@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Window
+    x:Class="IMWinUi.Views.NotificationWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="NotificationWindow">
+    <Window.SystemBackdrop>
+        <DesktopAcrylicBackdrop></DesktopAcrylicBackdrop>
+    </Window.SystemBackdrop>
+    <StackPanel>
+        <StackPanel x:Name="TitleBar" Orientation="Horizontal" Margin="8">
+            <FontIcon Glyph="&#xE724;" Margin="8,2,8,0" FontSize="14" />
+            <TextBlock Text="文件传输" />
+        </StackPanel>
+        <Grid Margin="26,8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Image Source="ms-appx:///Assets/zip.ico" Width="28" Height="28" />
+                <TextBlock Margin="10" Text="{x:Bind _fileName}" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button x:Name="PlayPauseButton"
+                        Margin="16,0"
+                        Padding="0"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Click="PlayPause_OnClick">
+                    <FontIcon x:Name="PlayPauseIcon"
+                              FontSize="16"
+                              Glyph="&#xE769;"
+                              FontWeight="Bold" />
+                </Button>
+
+                <Button
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="Cancel_OnClick">
+                    <FontIcon
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Glyph="&#xE711;" />
+                </Button>
+            </StackPanel>
+
+            <ProgressBar Grid.Row="1" Minimum="0" Maximum="100" Value="20" Margin="0,20,0,0" />
+        </Grid>
+    </StackPanel>
+</Window>

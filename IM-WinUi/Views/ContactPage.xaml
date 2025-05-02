@@ -56,7 +56,7 @@
                         Margin="5">
                 <Image Width="40"
                        Height="40"
-                       Source="ms-appx:///Assets/ContactPlaceholder.png" />
+                       Source="ms-appx:///Assets/logo.jpg" />
                 <StackPanel Margin="10,0,0,0"
                             VerticalAlignment="Center">
                     <TextBlock Text="{Binding Name}"

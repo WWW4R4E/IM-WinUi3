@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using Windows.Graphics;
+using IMWinUi.Helper;
 using WinRT.Interop;
 
 namespace IMWinUi.Views
@@ -22,31 +23,7 @@ namespace IMWinUi.Views
             InitializeComponent();
             Pt.SelectedIndex = select;
 
-            // 获取窗口句柄
-            IntPtr hWnd = WindowNative.GetWindowHandle(this);
-            WindowId windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
-
-            // 获取 AppWindow
-            AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
-
-            if (appWindow != null)
-            {
-                // 设置窗口大小
-                int width = 800;
-                int height = 1080;
-                appWindow.Resize(new SizeInt32(width, height));
-
-                // 获取显示器的工作区域
-                DisplayArea displayArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
-                RectInt32 workArea = displayArea.WorkArea;
-
-                // 计算居中位置
-                int x = (workArea.Width - width) / 2 + workArea.X;
-                int y = (workArea.Height - height) / 2 + workArea.Y;
-
-                // 移动窗口到居中位置
-                appWindow.MoveAndResize(new RectInt32(x, y, width, height));
-            }
+            WinHelper.SetWindowSizeAndCenter(this, 800, 1080);
         }
 
         private void SearchBox_OnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)

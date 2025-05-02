@@ -61,6 +61,9 @@
         <Page Update="Views\AddPage.xaml">
           <SubType>Designer</SubType>
         </Page>
+        <Page Update="Views\Windows\NotificationWindow.xaml">
+          <SubType>Designer</SubType>
+        </Page>
     </ItemGroup>
     <ItemGroup>
         <Page Update="Views\ContactPage.xaml">
@@ -98,22 +101,11 @@
             <Generator>SettingsSingleFileGenerator</Generator>
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
         </None>
-        <Page Update="Views\BlankWindow1.xaml">
-          <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\BlankPage1.xaml">
+        <Page Update="Views\SendFilePage.xaml">
           <Generator>MSBuild:Compile</Generator>
         </Page>
         <Page Update="Views\SettingPage.xaml">
           <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\SearchWindow.xaml">
-          <Generator>MSBuild:Compile</Generator>
-        </Page>
-    </ItemGroup>
-    <ItemGroup>
-        <Page Update="Views\LoginWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
         </Page>
     </ItemGroup>
 

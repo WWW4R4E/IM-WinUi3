@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Web.WebView2.Core;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -100,7 +101,7 @@ namespace IMWinUi.Views
         }
 
 
-        private async void ImageButton_Click(object sender, RoutedEventArgs e)
+        private async void FileButton_Click(object sender, RoutedEventArgs e)
         {
             var senderButton = sender as Button;
             if (senderButton != null)
@@ -124,6 +125,8 @@ namespace IMWinUi.Views
                 if (file != null)
                 {
                     Debug.WriteLine($"选择了文件: {file.Name}");
+                    var sendFilePage = new NotificationWindow(file.Path);
+                    sendFilePage.Activate();
                 }
             }
         }
